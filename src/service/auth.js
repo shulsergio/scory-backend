@@ -1,4 +1,38 @@
 import { SessionsCollection } from '../db/models/session';
+import { UsersCollection } from '../db/models/users';
+import createHttpError from 'http-errors';
+import bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
+import { ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME } from '../constants';
+
+/// LOGIN
+export const loginUser = async (payload, metadata) => {
+  const user = await UsersCollection.findOne({
+    userNickname: payload.userNickname,
+  });
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+  const isEqual = await bcrypt.compare(payload.password, user.password);
+
+  if (!isEqual) {
+    throw createHttpError(401, 'Unauthorized');
+  }
+
+  await SessionsCollection.deleteOne({ userId: user._id });
+
+  const accessToken = randomBytes(30).toString('base64');
+  const refreshToken = randomBytes(30).toString('base64');
+  return await SessionsCollection.create({
+    userId: user._id,
+    accessToken,
+    refreshToken,
+    accessTokenValidUntil: new Date(Date.now() + ACCESS_TOKEN_TIME),
+    refreshTokenValidUntil: new Date(Date.now() + REFRESH_TOKEN_TIME),
+    ip: metadata.ip,
+    userAgent: metadata.userAgent,
+  });
+};
 
 /// LOGOUT
 export const logoutUser = async (sessionId) => {
