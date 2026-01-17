@@ -5,6 +5,28 @@ import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME } from '../constants';
 
+/// register
+export const registerUser = async (payload) => {
+  const existingUser = await UsersCollection.findOne({
+    $or: [{ userNickname: payload.userNickname }, { email: payload.email }],
+  });
+
+  if (existingUser) {
+    if (existingUser.userNickname === payload.userNickname) {
+      throw createHttpError(409, 'Nickname already in use');
+    }
+    throw createHttpError(409, 'Email already in use');
+  }
+  const hashedPassword = await bcrypt.hash(payload.password, 10);
+  const newUser = new UsersCollection({
+    userName: payload.userName,
+    userNickname: payload.userNickname,
+    email: payload.email,
+    password: hashedPassword,
+  });
+  return newUser;
+};
+
 /// LOGIN
 export const loginUser = async (payload, metadata) => {
   const user = await UsersCollection.findOne({

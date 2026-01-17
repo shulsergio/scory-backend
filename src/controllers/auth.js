@@ -2,7 +2,26 @@
 // import jwt from 'jsonwebtoken';
 import { REFRESH_TOKEN_TIME } from '../constants';
 import { UsersCollection } from '../db/models/users';
-import { loginUser, logoutUser } from '../service/auth';
+import { loginUser, logoutUser, registerUser } from '../service/auth';
+
+export const registerUserController = async (req, res, next) => {
+  try {
+    const user = await registerUser(req.body);
+    res.status(201).json({
+      status: 201,
+      message: 'User created!',
+      data: {
+        id: user._id,
+        nickname: user.userNickname,
+        email: user.email,
+        points: user.points,
+      },
+    });
+  } catch (error) {
+    console.error('Error in registerUserController:', error);
+    next(error);
+  }
+};
 
 //// LOGIN
 export const loginUserController = async (req, res) => {
