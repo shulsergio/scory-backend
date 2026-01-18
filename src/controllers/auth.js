@@ -4,6 +4,16 @@ import { REFRESH_TOKEN_TIME } from '../constants';
 import { UsersCollection } from '../db/models/users';
 import { loginUser, logoutUser, registerUser } from '../service/auth';
 
+/**
+ * --контроллер для регистрации пользователя--
+ * payload - приходящие данные для регистрации пользователя
+ * registerUser - сервис для регистрации пользователя
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @export
+ * @return {*}
+ */
 export const registerUserController = async (req, res, next) => {
   try {
     const user = await registerUser(req.body);
@@ -23,7 +33,16 @@ export const registerUserController = async (req, res, next) => {
   }
 };
 
-//// LOGIN
+/**
+ * --контроллер для логина пользователя--
+ * userNickname - никнейм пользователя
+ * metadata - информация о запросе (ip, userAgent)
+ * loginUser - сервис для логина пользователя
+ * @param {*} req
+ * @param {*} res
+ * @export
+ * @return {*}
+ */
 export const loginUserController = async (req, res) => {
   const { userNickname } = req.body;
   const metadata = {
@@ -67,14 +86,23 @@ export const loginUserController = async (req, res) => {
   });
 };
 
-//// LOGOUT
-
+/**
+ * --контроллер для логаута пользователя--
+ * получает из куки id сессии пользователя и идет в logoutUser
+ * sessionId - id сессии пользователя из куки
+ * logoutUser - сервис для логаута пользователя
+ * @param {*} req
+ * @param {*} res
+ */
 export const logoutUserController = async (req, res) => {
-  if (req.cookies.sessionId) {
-    await logoutUser(req.cookies.sessionId);
+  const { sessionId } = req.cookies;
+
+  if (sessionId) {
+    await logoutUser(sessionId);
   }
 
   res.clearCookie('sessionId');
   res.clearCookie('refreshToken');
+
   res.status(204).send();
 };

@@ -5,7 +5,13 @@ import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME } from '../constants';
 
-/// register
+/**
+ * --сервис для регистрации пользователя--
+ * Проверяет наличие пользователя с таким же никнеймом или email
+ * payload - данные для регистрации пользователя
+ * @param {*} payload --данные для регистрации пользователя
+ * @returns -- новый пользователь
+ */
 export const registerUser = async (payload) => {
   const existingUser = await UsersCollection.findOne({
     $or: [{ userNickname: payload.userNickname }, { email: payload.email }],
@@ -27,7 +33,12 @@ export const registerUser = async (payload) => {
   return newUser;
 };
 
-/// LOGIN
+/**
+ * --сервис для логина пользователя--
+ * @param {*} payload --данные для логина пользователя
+ * @param {*} metadata -- информация о запросе (ip, userAgent)
+ * @returns -- сессия пользователя
+ */
 export const loginUser = async (payload, metadata) => {
   const user = await UsersCollection.findOne({
     userNickname: payload.userNickname,
@@ -56,7 +67,10 @@ export const loginUser = async (payload, metadata) => {
   });
 };
 
-/// LOGOUT
+/**
+ * --сервис для логаута пользователя--
+ * @param {*} sessionId -- id сессии пользователя
+ */
 export const logoutUser = async (sessionId) => {
   await SessionsCollection.deleteOne({ _id: sessionId });
 };

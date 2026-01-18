@@ -1,3 +1,8 @@
+/**
+ * --обертка для контроллеров с обработкой ошибок--
+ * @param {*} ctrl
+ * @returns
+ */
 export const ctrlWrapper = (ctrl) => {
   return async (req, res, next) => {
     try {

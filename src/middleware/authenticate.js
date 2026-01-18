@@ -2,6 +2,14 @@ import createHttpError from 'http-errors';
 import { SessionsCollection } from '../models/Sessions.js';
 import { UsersCollection } from '../models/User.js';
 
+/**
+ * --middleware для аутентификации пользователя--
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ */
 export const authenticate = async (req, res, next) => {
   const authHeader = req.get('Authorization');
   if (!authHeader) {
