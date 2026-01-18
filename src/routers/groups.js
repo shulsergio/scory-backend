@@ -1,15 +1,24 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/authenticate';
 import { ctrlWrapper } from '../utils/ctrlWrapper';
-import { createGroupController } from '../controllers/groups';
+import {
+  createGroupController,
+  getGroupResultsController,
+} from '../controllers/groups';
 
-const authRouter = Router();
+const groupRouter = Router();
 
 // Создание группы
-authRouter.post(
+groupRouter.post(
   '/creategroup/',
   authenticate,
   ctrlWrapper(createGroupController),
 );
+// Получение результатов группы
+groupRouter.get(
+  '/:groupId',
+  authenticate,
+  ctrlWrapper(getGroupResultsController),
+);
 
-export default authRouter;
+export default groupRouter;

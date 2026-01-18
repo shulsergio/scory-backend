@@ -24,3 +24,28 @@ export const createGroup = async (name, adminId) => {
 
   return newGroup;
 };
+
+/**
+ * --сервис для получения результатов группы--
+ * @param {*} groupId -- идентификатор группы
+ * @returns
+ */
+export const getGroupLeaderboard = async (groupId) => {
+  const group = await GroupCollection.findById(groupId);
+  if (!group) {
+    throw new Error('Group not found');
+  }
+  const members = await MembershipCollection.find({ groupId })
+    .populate('userId', 'userNickname')
+    .sort({ totalPoints: -1 });
+
+  return {
+    groupName: group.name,
+    inviteCode: group.inviteCode,
+    leaderboard: members.map((m) => ({
+      nickname: m.userId.userNickname,
+      points: m.totalPoints,
+      joinedAt: m.joinedAt,
+    })),
+  };
+};
