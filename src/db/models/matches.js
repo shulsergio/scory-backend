@@ -45,7 +45,7 @@ const matchesSchema = new Schema(
     league: {
       type: String,
       required: true,
-      default: 'World Cup 2026',
+      default: 'WC2026',
     },
 
     stadium: {
