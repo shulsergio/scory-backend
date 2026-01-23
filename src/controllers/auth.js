@@ -1,6 +1,6 @@
 // import bcrypt from 'bcrypt';
 // import jwt from 'jsonwebtoken';
-import { REFRESH_TOKEN_TIME } from '../constants.js';
+import { REFRESH_TOKEN_TIME } from '../constants/index.js';
 import { UsersCollection } from '../db/models/users.js';
 import { loginUser, logoutUser, registerUser } from '../service/auth.js';
 

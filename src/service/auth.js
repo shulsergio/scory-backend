@@ -3,7 +3,7 @@ import { UsersCollection } from '../db/models/users.js';
 import createHttpError from 'http-errors';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-import { ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME } from '../constants.js';
+import { ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME } from '../constants/index.js';
 
 /**
  * --сервис для регистрации пользователя--
