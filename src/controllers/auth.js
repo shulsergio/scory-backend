@@ -1,8 +1,8 @@
 // import bcrypt from 'bcrypt';
 // import jwt from 'jsonwebtoken';
-import { REFRESH_TOKEN_TIME } from '../constants';
-import { UsersCollection } from '../db/models/users';
-import { loginUser, logoutUser, registerUser } from '../service/auth';
+import { REFRESH_TOKEN_TIME } from '../constants.js';
+import { UsersCollection } from '../db/models/users.js';
+import { loginUser, logoutUser, registerUser } from '../service/auth.js';
 
 /**
  * --контроллер для регистрации пользователя--

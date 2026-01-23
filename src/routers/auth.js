@@ -3,9 +3,9 @@ import {
   loginUserController,
   logoutUserController,
   registerUserController,
-} from '../controllers/auth';
-import ctrlWrapper from '../utils/ctrlWrapper';
-import { authenticate } from '../middleware/authenticate';
+} from '../controllers/auth.js';
+import ctrlWrapper from '../utils/ctrlWrapper.js';
+import { authenticate } from '../middleware/authenticate.js';
 
 const authRouter = Router();
 

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import ctrlWrapper from '../utils/ctrlWrapper';
-import { getAllMatchesController } from '../controllers/matches';
+import ctrlWrapper from '../utils/ctrlWrapper.js';
+import { getAllMatchesController } from '../controllers/matches.js';
 
 const matchesRouter = Router();
 

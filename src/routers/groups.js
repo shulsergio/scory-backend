@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/authenticate';
-import { ctrlWrapper } from '../utils/ctrlWrapper';
+import { authenticate } from '../middleware/authenticate.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   createGroupController,
   getGroupResultsController,
-} from '../controllers/groups';
+} from '../controllers/groups.js';
 
 const groupRouter = Router();
 

@@ -1,9 +1,9 @@
-import { SessionsCollection } from '../db/models/session';
-import { UsersCollection } from '../db/models/users';
+import { SessionsCollection } from '../db/models/session.js';
+import { UsersCollection } from '../db/models/users.js';
 import createHttpError from 'http-errors';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-import { ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME } from '../constants';
+import { ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME } from '../constants.js';
 
 /**
  * --сервис для регистрации пользователя--

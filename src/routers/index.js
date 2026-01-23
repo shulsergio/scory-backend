@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import authRouter from './auth';
+import authRouter from './auth.js';
 
 const indexRouter = Router();
 console.log('***** CONSOLE - index - IS OK');

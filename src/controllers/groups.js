@@ -1,4 +1,4 @@
-import { createGroup, getGroupLeaderboard } from '../service/groups';
+import { createGroup, getGroupLeaderboard } from '../service/groups.js';
 
 /**
  * --контроллер для создания группы--

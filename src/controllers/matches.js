@@ -1,4 +1,4 @@
-import { MatchesCollection } from '../db/models/matches';
+import { MatchesCollection } from '../db/models/matches.js';
 
 /**
  *--контроллер для получения всех матчей--

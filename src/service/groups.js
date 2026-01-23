@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
-import { GroupCollection } from '../db/models/groups';
-import { MembershipCollection } from '../db/models/memberships';
+import { GroupCollection } from '../db/models/groups.js';
+import { MembershipCollection } from '../db/models/memberships.js';
 
 /**
  * --сервис для создания группы--
