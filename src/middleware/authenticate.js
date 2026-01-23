@@ -1,6 +1,6 @@
 import createHttpError from 'http-errors';
-import { SessionsCollection } from '../models/sessions.js';
-import { UsersCollection } from '../models/user.js';
+import { SessionsCollection } from '../db/models/session.js';
+import { UsersCollection } from '../db/models/users.js';
 
 /**
  * --middleware для аутентификации пользователя--
