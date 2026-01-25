@@ -1,14 +1,16 @@
-const mongoose = require('mongoose');
+import { model, Schema } from 'mongoose';
 
-const MembershipSchema = new mongoose.Schema({
-  groupId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'groups',
+ 
+const MembershipSchema = new Schema({
+  leagueId: {
+ 
+    type: Schema.Types.ObjectId,
+    ref: 'leagues',  
     required: true,
     index: true,
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'users',
     required: true,
     index: true,
@@ -22,10 +24,6 @@ const MembershipSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
-MembershipSchema.index({ groupId: 1, userId: 1 }, { unique: true });
-
-export const MembershipCollection = mongoose.model(
-  'memberships',
-  MembershipSchema,
-);
+ 
+MembershipSchema.index({ leagueId: 1, userId: 1 }, { unique: true });
+export const MembershipCollection = model('memberships', MembershipSchema);
