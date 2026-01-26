@@ -8,7 +8,7 @@ const LeagueSchema = new Schema(
       trim: true,
       unique: true,
     },
-    owner: {
+    adminId: {
       type: Schema.Types.ObjectId,
       ref: 'users',
       required: true,
