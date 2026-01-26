@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { ctrlWrapper } from '../utils/ctrlWrapper';
-import { getTeamByIdController } from '../controllers/teams';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import { getTeamByIdController } from '../controllers/teams.js';
 
 const teamsRouter = Router();
 
