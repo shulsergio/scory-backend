@@ -1,6 +1,6 @@
 //
 
-import { TeamsCollection } from '../db/models/teams';
+import { TeamsCollection } from '../db/models/teams.js';
 
 //
 export const getTeamByIdController = async (req, res, next) => {
