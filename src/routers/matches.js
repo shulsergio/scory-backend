@@ -4,6 +4,6 @@ import { getAllMatchesController } from '../controllers/matches.js';
 
 const matchesRouter = Router();
 
-matchesRouter.post('/allmatches', ctrlWrapper(getAllMatchesController));
+matchesRouter.get('/matches', ctrlWrapper(getAllMatchesController));
 // matchesRouter.post('/', ctrlWrapper());
 export default matchesRouter;
