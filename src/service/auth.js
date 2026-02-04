@@ -24,7 +24,7 @@ export const registerUser = async (payload) => {
     throw createHttpError(409, 'Email already in use');
   }
   const hashedPassword = await bcrypt.hash(payload.password, 10);
-  const newUser = new UsersCollection({
+  const newUser = await UsersCollection.create({
     userName: payload.userName,
     userNickname: payload.userNickname,
     email: payload.email,
@@ -32,7 +32,6 @@ export const registerUser = async (payload) => {
   });
   return newUser;
 };
-
 /**
  * --сервис для логина пользователя--
  * @param {*} payload --данные для логина пользователя
