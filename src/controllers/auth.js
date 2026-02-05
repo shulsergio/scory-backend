@@ -45,41 +45,32 @@ export const registerUserController = async (req, res, next) => {
  */
 export const loginUserController = async (req, res, next) => {
   try {
-    const { userNickname } = req.body;  
-
     const metadata = {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
     };
- 
-    const user = await UsersCollection.findOne({ userNickname });
-    if (!user) {
-      return res.status(404).json({
-        status: 404,
-        message: 'User not found',
-      });
-    }
-  const session = await loginUser(req.body, metadata);
- 
+
+    const session = await loginUser(req.body, metadata);
+
     const updatedUser = await UsersCollection.findByIdAndUpdate(
-      user._id,
+      session.userId,
       { lastVisit: new Date() },
       { new: true },
     );
-
- 
     res.cookie('refreshToken', session.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',  
+      secure: true,
+      sameSite: 'none',
       expires: new Date(Date.now() + REFRESH_TOKEN_TIME),
     });
 
     res.cookie('sessionId', session._id, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
+      sameSite: 'none',
       expires: new Date(Date.now() + REFRESH_TOKEN_TIME),
     });
- 
+
     res.status(200).json({
       status: 200,
       message: 'Successfully logged in!',
@@ -92,7 +83,7 @@ export const loginUserController = async (req, res, next) => {
         },
       },
     });
-  } catch (error) { 
+  } catch (error) {
     console.error('Login error:', error.message);
     next(error);
   }
