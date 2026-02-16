@@ -1,5 +1,9 @@
 import createHttpError from 'http-errors';
-import { createLeague, getLeagueResults } from '../service/leagues.js';
+import {
+  createLeague,
+  getLeagueResults,
+  getUserLeagues,
+} from '../service/leagues.js';
 
 /**
  * --контроллер для создания группы--
@@ -45,5 +49,23 @@ export const getLeagueResultsController = async (req, res) => {
     status: 200,
     message: 'Результаты лиги успешно получены',
     data: results,
+  });
+};
+
+/**
+ * --контроллер для получения списка лиг конкретного юзера--
+ * userId - идентификатор пользователя
+ * @param {*} req
+ * @param {*} res
+ * @export
+ * @return {*}
+ */
+export const getUserLeaguesController = async (req, res) => {
+  const userId = req.user._id;
+  const leagues = await getUserLeagues(userId);
+  res.status(200).json({
+    status: 200,
+    message: 'Лиги пользователя успешно получены',
+    data: leagues,
   });
 };
