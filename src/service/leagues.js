@@ -56,3 +56,23 @@ export const getLeagueResults = async (leagueId) => {
       })),
   };
 };
+
+
+/**
+ * --сервис для получения списка лиг конкретного юзера--
+ * @param {*} userId -- идентификатор пользователя
+ * 
+ * @returns -- список лиг, в которых состоит пользователь, с указанием его общего количества очков в каждой лиге
+ */
+export const getUserLeagues = async (userId) => {
+  const memberships = await MembershipCollection.find({ userId }).populate(
+    'leagueId',
+    'name',
+  );
+
+  return memberships.map((m) => ({
+    leagueId: m.leagueId._id,
+    leagueName: m.leagueId.name,
+    totalPoints: m.totalPoints,
+  }));
+};
