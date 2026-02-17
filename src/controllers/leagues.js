@@ -6,10 +6,10 @@ import {
 } from '../service/leagues.js';
 
 /**
- * --контроллер для создания группы--
- * создает новую группу с заданным именем и администратором.
- * name - название группы
- * adminId - id пользователя, создающего группу
+ * --контроллер для создания Лиги--
+ * создает новую Лигу с заданным именем и администратором.
+ * name - название Лиги
+ * adminId - id пользователя, создающего Лигу
  *
  * @param {*} req
  * @param {*} res
@@ -19,8 +19,8 @@ import {
 export const createLeagueController = async (req, res) => {
   const { name } = req.body;
   const adminId = req.user._id;
-  if (!name) {
-    throw createHttpError(409, 'Такая Лига уже существует');
+  if (!name || name.trim() === '') {
+    throw createHttpError(400, 'Название лиги не может быть пустым');
   }
 
   const league = await createLeague(name, adminId);
@@ -33,8 +33,8 @@ export const createLeagueController = async (req, res) => {
 };
 
 /**
- * --контроллер для получения результатов группы--
- * leagueId - идентификатор группы
+ * --контроллер для получения результатов Лиги--
+ * leagueId - идентификатор Лиги
  * @param {*} req
  * @param {*} res
  * @export
