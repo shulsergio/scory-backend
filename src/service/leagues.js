@@ -63,18 +63,20 @@ export const getLeagueResults = async (leagueId) => {
  *
  * @returns -- список лиг, в которых состоит пользователь, с указанием его общего количества очков в каждой лиге
  */
+
 export const getUserLeagues = async (userId) => {
-  console.log('Searching memberships for userId:', userId);
   const memberships = await MembershipCollection.find({ userId })
     .populate('leagueId', 'name avatarUrl')
     .lean();
-  console.log('Found memberships count:', memberships.length);
+
+  if (!memberships) return [];
+
   return memberships
-    .filter((m) => m.leagueId !== null)
+    .filter((m) => m.leagueId && typeof m.leagueId === 'object') // Проверка на существование и что это объект
     .map((m) => ({
       leagueId: m.leagueId._id,
-      leagueName: m.leagueId.name,
+      leagueName: m.leagueId.name || 'Без названия',
       leagueAvatar: m.leagueId.avatarUrl || null,
-      totalPoints: m.totalPoints,
+      totalPoints: m.totalPoints || 0,
     }));
 };
