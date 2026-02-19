@@ -61,6 +61,14 @@ export const getLeagueResultsController = async (req, res) => {
  * @return {*}
  */
 export const getUserLeaguesController = async (req, res) => {
+ 
+  if (!req.user || !req.user._id) {
+    console.log('USER FROM REQ req.user:', req.user);
+        console.log('USER FROM REQ req.user._id:', req.user._id);
+    console.error('ОШИБКА: req.user не определен в контроллере!');
+    return res.status(401).json({ message: 'Пользователь не авторизован' });
+  }
+
   const userId = req.user._id;
   console.log('USER FROM REQ:', req.user);
   const leagues = await getUserLeagues(userId);
@@ -69,4 +77,4 @@ export const getUserLeaguesController = async (req, res) => {
     message: 'Лиги пользователя успешно получены',
     data: leagues,
   });
-};
+};;
