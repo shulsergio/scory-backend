@@ -61,12 +61,11 @@ export const getLeagueResultsController = async (req, res) => {
  * @return {*}
  */
 export const getUserLeaguesController = async (req, res) => {
-  try { 
-    const userId = req.user?._id || req.user?.id;
+  try {
+    const userId = req.user?._id;
 
     if (!userId) {
-      console.error('!!! ОШИБКА: ID пользователя не найден в req.user');
-      return res.status(401).json({ message: 'Unauthorized: No user ID' });
+      return res.status(401).json({ message: 'Юзер не найден в req.user' });
     }
 
     const leagues = await getUserLeagues(userId);
@@ -76,16 +75,13 @@ export const getUserLeaguesController = async (req, res) => {
       message: 'Лиги пользователя успешно получены',
       data: leagues,
     });
-  } catch (error) { 
-    console.log('------------------------------------');
-    console.error('REAL ERROR MESSAGE:', error.message);
-    console.error('ERROR STACK:', error.stack);
-    console.log('------------------------------------');
-
+  } catch (error) {
+    // ВНИМАНИЕ: отправляем текст ошибки клиенту
     res.status(500).json({
       status: 500,
-      message: 'Internal Server Error',
-      debug: error.message, 
+      message: 'Сервер сломался!',
+      details: error.message, // Вот тут будет написано, что именно (напр. "MembershipCollection is not defined")
+      stack: error.stack, // И на какой строке
     });
   }
 };
