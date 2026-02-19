@@ -61,20 +61,31 @@ export const getLeagueResultsController = async (req, res) => {
  * @return {*}
  */
 export const getUserLeaguesController = async (req, res) => {
- 
-  if (!req.user || !req.user._id) {
-    console.log('USER FROM REQ req.user:', req.user);
-        console.log('USER FROM REQ req.user._id:', req.user._id);
-    console.error('ОШИБКА: req.user не определен в контроллере!');
-    return res.status(401).json({ message: 'Пользователь не авторизован' });
-  }
+  console.log('--- DEBUG START ---');
+  console.log('Request User:', req.user);  
 
-  const userId = req.user._id;
-  console.log('USER FROM REQ:', req.user);
-  const leagues = await getUserLeagues(userId);
-  res.status(200).json({
-    status: 200,
-    message: 'Лиги пользователя успешно получены',
-    data: leagues,
-  });
-};;
+  try {
+    const userId = req.user._id;
+    console.log('UserId extracted:', userId);
+
+    const leagues = await getUserLeagues(userId);
+    console.log('Leagues found:', leagues);
+
+    res.status(200).json({
+      status: 200,
+      message: 'Лиги пользователя успешно получены',
+      data: leagues,
+    });
+  } catch (error) {
+    // ВОТ ЭТОТ ЛОГ САМЫЙ ВАЖНЫЙ
+    console.error('!!! КРИТИЧЕСКАЯ ОШИБКА В КОНТРОЛЛЕРЕ:', error.message);
+    console.error(error.stack);
+
+    res.status(500).json({
+      status: 500,
+      message: 'Внутренняя ошибка сервера',
+      error: error.message,
+    });
+  }
+  console.log('--- DEBUG END ---');
+};
