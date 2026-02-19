@@ -61,31 +61,31 @@ export const getLeagueResultsController = async (req, res) => {
  * @return {*}
  */
 export const getUserLeaguesController = async (req, res) => {
-  console.log('--- DEBUG START ---');
-  console.log('Request User:', req.user);  
+  try { 
+    const userId = req.user?._id || req.user?.id;
 
-  try {
-    const userId = req.user._id;
-    console.log('UserId extracted:', userId);
+    if (!userId) {
+      console.error('!!! ОШИБКА: ID пользователя не найден в req.user');
+      return res.status(401).json({ message: 'Unauthorized: No user ID' });
+    }
 
     const leagues = await getUserLeagues(userId);
-    console.log('Leagues found:', leagues);
 
     res.status(200).json({
       status: 200,
       message: 'Лиги пользователя успешно получены',
       data: leagues,
     });
-  } catch (error) {
-    // ВОТ ЭТОТ ЛОГ САМЫЙ ВАЖНЫЙ
-    console.error('!!! КРИТИЧЕСКАЯ ОШИБКА В КОНТРОЛЛЕРЕ:', error.message);
-    console.error(error.stack);
+  } catch (error) { 
+    console.log('------------------------------------');
+    console.error('REAL ERROR MESSAGE:', error.message);
+    console.error('ERROR STACK:', error.stack);
+    console.log('------------------------------------');
 
     res.status(500).json({
       status: 500,
-      message: 'Внутренняя ошибка сервера',
-      error: error.message,
+      message: 'Internal Server Error',
+      debug: error.message, 
     });
   }
-  console.log('--- DEBUG END ---');
 };

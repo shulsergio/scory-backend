@@ -66,16 +66,18 @@ export const getLeagueResults = async (leagueId) => {
 
 export const getUserLeagues = async (userId) => {
   const memberships = await MembershipCollection.find({ userId })
-    .populate('leagueId', 'name avatarUrl')
+    .populate('leagueId')
     .lean();
 
-  if (!memberships) return [];
+  if (!memberships || !Array.isArray(memberships)) return [];
 
   return memberships
-    .filter((m) => m.leagueId && typeof m.leagueId === 'object') // Проверка на существование и что это объект
+    .filter((m) => {
+      return m.leagueId && typeof m.leagueId === 'object' && m.leagueId._id;
+    })
     .map((m) => ({
       leagueId: m.leagueId._id,
-      leagueName: m.leagueId.name || 'Без названия',
+      leagueName: m.leagueId.name || 'Название не указано',
       leagueAvatar: m.leagueId.avatarUrl || null,
       totalPoints: m.totalPoints || 0,
     }));
