@@ -62,6 +62,7 @@ export const getLeagueResultsController = async (req, res) => {
  */
 export const getUserLeaguesController = async (req, res) => {
   const userId = req.user._id;
+  console.log('USER FROM REQ:', req.user);
   const leagues = await getUserLeagues(userId);
   res.status(200).json({
     status: 200,

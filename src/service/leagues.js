@@ -64,10 +64,11 @@ export const getLeagueResults = async (leagueId) => {
  * @returns -- список лиг, в которых состоит пользователь, с указанием его общего количества очков в каждой лиге
  */
 export const getUserLeagues = async (userId) => {
+  console.log('Searching memberships for userId:', userId);
   const memberships = await MembershipCollection.find({ userId })
     .populate('leagueId', 'name avatarUrl')
     .lean();
-
+  console.log('Found memberships count:', memberships.length);
   return memberships
     .filter((m) => m.leagueId !== null)
     .map((m) => ({
