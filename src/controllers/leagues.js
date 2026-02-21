@@ -76,12 +76,11 @@ export const getUserLeaguesController = async (req, res) => {
       data: leagues,
     });
   } catch (error) {
-    // ВНИМАНИЕ: отправляем текст ошибки клиенту
     res.status(500).json({
       status: 500,
       message: 'Сервер сломался!',
-      details: error.message, // Вот тут будет написано, что именно (напр. "MembershipCollection is not defined")
-      stack: error.stack, // И на какой строке
+      details: error.message,
+      stack: error.stack,
     });
   }
 };
