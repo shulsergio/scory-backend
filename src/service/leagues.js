@@ -80,5 +80,6 @@ export const getUserLeagues = async (userId) => {
       leagueName: m.leagueId.name || 'Название не указано',
       leagueAvatar: m.leagueId.avatarUrl || null,
       totalPoints: m.totalPoints || 0,
+      adminId: m.leagueId.adminId || null,
     }));
 };
