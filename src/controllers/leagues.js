@@ -4,6 +4,7 @@ import {
   getLeagueResults,
   getUserLeagues,
 } from '../service/leagues.js';
+import { LeagueCollection } from '../db/models/leagues.js';
 
 /**
  * --контроллер для создания Лиги--
@@ -83,4 +84,33 @@ export const getUserLeaguesController = async (req, res) => {
       stack: error.stack,
     });
   }
+};
+
+export const getListOfAllLeaguesController = async (req, res) => {
+  const leagues = await LeagueCollection.aggregate([
+    {
+      $lookup: {
+        from: 'memberships',
+        localField: '_id',
+        foreignField: 'leagueId',
+        as: 'members',
+      },
+    },
+    {
+      $project: {
+        leagueId: '$_id',
+        leagueName: '$name',
+        leagueAvatar: '$avatarUrl',
+        adminId: 1,
+        membersCount: { $size: '$members' },
+      },
+    },
+    { $sort: { membersCount: -1 } },
+  ]);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully fetched all leagues',
+    data: leagues,
+  });
 };

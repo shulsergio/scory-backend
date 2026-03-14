@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createLeagueController,
   getLeagueResultsController,
+  getListOfAllLeaguesController,
   getUserLeaguesController,
 } from '../controllers/leagues.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
@@ -29,5 +30,8 @@ leaguesRouter.get(
   authenticate,
   ctrlWrapper(getLeagueResultsController),
 );
+
+// Получение списка всех лиг
+leaguesRouter.get('/', ctrlWrapper(getListOfAllLeaguesController));
 
 export default leaguesRouter;
