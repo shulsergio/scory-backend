@@ -4,6 +4,7 @@ import {
   getLeagueResultsController,
   getListOfAllLeaguesController,
   getUserLeaguesController,
+  joinLeagueController,
 } from '../controllers/leagues.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { authenticate } from '../middleware/authenticate.js';
@@ -16,6 +17,8 @@ leaguesRouter.post(
   authenticate,
   ctrlWrapper(createLeagueController),
 );
+// Получение списка всех лиг
+leaguesRouter.get('/', ctrlWrapper(getListOfAllLeaguesController));
 
 // Получение списока лиг конкретного юзера
 leaguesRouter.get(
@@ -31,7 +34,10 @@ leaguesRouter.get(
   ctrlWrapper(getLeagueResultsController),
 );
 
-// Получение списка всех лиг
-leaguesRouter.get('/', ctrlWrapper(getListOfAllLeaguesController));
+leaguesRouter.post(
+  '/:leagueId/join',
+  authenticate,
+  ctrlWrapper(joinLeagueController),
+);
 
 export default leaguesRouter;

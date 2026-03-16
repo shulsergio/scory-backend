@@ -3,6 +3,7 @@ import {
   createLeague,
   getLeagueResults,
   getUserLeagues,
+  joinLeagueService,
 } from '../service/leagues.js';
 import { LeagueCollection } from '../db/models/leagues.js';
 
@@ -112,5 +113,18 @@ export const getListOfAllLeaguesController = async (req, res) => {
     status: 200,
     message: 'Successfully fetched all leagues',
     data: leagues,
+  });
+};
+
+export const joinLeagueController = async (req, res) => {
+  const { leagueId } = req.params;
+  const userId = req.user._id;
+
+  const result = await joinLeagueService(leagueId, userId);
+
+  res.status(201).json({
+    status: 201,
+    message: 'Successfully joined the league!',
+    data: result,
   });
 };

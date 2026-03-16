@@ -84,3 +84,23 @@ export const getUserLeagues = async (userId) => {
       adminId: m.leagueId.adminId || null,
     }));
 };
+
+export const joinLeagueService = async (leagueId, userId) => {
+  const league = await LeagueCollection.findById(leagueId);
+  if (!league) {
+    throw createHttpError(404, 'League not found');
+  }
+  const existingMembership = await MembershipCollection.findOne({
+    leagueId,
+    userId,
+  });
+  if (existingMembership) {
+    throw createHttpError(400, 'You are already a member of this league');
+  }
+  const newMembership = await MembershipCollection.create({
+    leagueId,
+    userId,
+    totalPoints: 0,
+  });
+  return newMembership;
+};
