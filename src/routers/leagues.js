@@ -29,11 +29,7 @@ leaguesRouter.get(
 );
 
 // Получение результатов лиги
-leaguesRouter.get(
-  '/:leagueId',
-  authenticate,
-  ctrlWrapper(getLeagueResultsController),
-);
+leaguesRouter.get('/:leagueId', ctrlWrapper(getLeagueResultsController));
 
 leaguesRouter.post(
   '/:leagueId/join',

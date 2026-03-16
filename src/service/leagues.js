@@ -36,14 +36,15 @@ export const createLeague = async (name, adminId) => {
  * @returns
  */
 export const getLeagueResults = async (leagueId) => {
-  const league = await LeagueCollection.findById(leagueId);
+  const league = await LeagueCollection.findById(leagueId).lean();
   if (!league) {
     throw createHttpError(404, 'Лига не найдена');
   }
 
   const members = await MembershipCollection.find({ leagueId })
     .populate('userId', 'userNickname')
-    .sort({ totalPoints: -1 });
+    .sort({ totalPoints: -1 })
+    .lean();
 
   return {
     leagueName: league.name,
