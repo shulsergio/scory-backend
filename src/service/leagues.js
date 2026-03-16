@@ -47,6 +47,7 @@ export const getLeagueResults = async (leagueId) => {
 
   return {
     leagueName: league.name,
+    adminId: league.adminId,
     leaderboard: members
       .filter((m) => m.userId)
       .map((m) => ({
