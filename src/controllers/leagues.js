@@ -4,6 +4,7 @@ import {
   getLeagueResults,
   getUserLeagues,
   joinLeagueService,
+  leaveLeagueService,
 } from '../service/leagues.js';
 import { LeagueCollection } from '../db/models/leagues.js';
 
@@ -125,6 +126,19 @@ export const joinLeagueController = async (req, res) => {
   res.status(201).json({
     status: 201,
     message: 'Successfully joined the league!',
+    data: result,
+  });
+};
+
+export const leaveLeagueController = async (req, res) => {
+  const { leagueId } = req.params;
+  const userId = req.user._id;
+
+  const result = await leaveLeagueService(leagueId, userId);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully left the league!',
     data: result,
   });
 };

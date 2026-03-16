@@ -104,3 +104,27 @@ export const joinLeagueService = async (leagueId, userId) => {
   });
   return newMembership;
 };
+
+export const leaveLeagueService = async (leagueId, userId) => {
+  const league = await LeagueCollection.findById(leagueId);
+
+  if (!league) throw createHttpError(404, 'League not found');
+
+  if (league.adminId.toString() === userId.toString()) {
+    throw createHttpError(
+      400,
+      'Admins cannot leave. Delete the league to proceed.',
+    );
+  }
+
+  const result = await MembershipCollection.findOneAndDelete({
+    leagueId,
+    userId,
+  });
+
+  if (!result) {
+    throw createHttpError(400, 'You are not a member of this league');
+  }
+
+  return { message: 'Success' };
+};

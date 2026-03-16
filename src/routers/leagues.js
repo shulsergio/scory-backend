@@ -5,6 +5,7 @@ import {
   getListOfAllLeaguesController,
   getUserLeaguesController,
   joinLeagueController,
+  leaveLeagueController,
 } from '../controllers/leagues.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { authenticate } from '../middleware/authenticate.js';
@@ -38,6 +39,12 @@ leaguesRouter.post(
   '/:leagueId/join',
   authenticate,
   ctrlWrapper(joinLeagueController),
+);
+
+leaguesRouter.delete(
+  '/:leagueId/leave',
+  authenticate,
+  ctrlWrapper(leaveLeagueController),
 );
 
 export default leaguesRouter;
