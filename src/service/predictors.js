@@ -32,3 +32,58 @@ export const upsertPrediction = async ({
 
   return prediction;
 };
+
+export const getMatchesWithPredictions = async (userId, league = 'WC2026') => {
+  const matches = await MatchesCollection.aggregate([
+    {
+      $match: { league: league },
+    },
+    {
+      $lookup: {
+        from: 'predictors',
+        let: { matchId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$matchId', '$$matchId'] },
+                  { $eq: ['$userId', userId] },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'userPrediction',
+      },
+    },
+    {
+      $addFields: {
+        prediction: { $arrayElemAt: ['$userPrediction', 0] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'teams',
+        localField: 'homeTeam',
+        foreignField: '_id',
+        as: 'homeTeam',
+      },
+    },
+    { $unwind: '$homeTeam' },
+    {
+      $lookup: {
+        from: 'teams',
+        localField: 'awayTeam',
+        foreignField: '_id',
+        as: 'awayTeam',
+      },
+    },
+    { $unwind: '$awayTeam' },
+    {
+      $sort: { kickoffTime: 1 },
+    },
+  ]);
+
+  return matches;
+};

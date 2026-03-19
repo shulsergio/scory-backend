@@ -1,5 +1,8 @@
 import createHttpError from 'http-errors';
-import { upsertPrediction } from '../service/predictors';
+import {
+  getMatchesWithPredictions,
+  upsertPrediction,
+} from '../service/predictors';
 
 export const upsertPredictionController = async (req, res) => {
   const userId = req.user._id;
@@ -20,5 +23,18 @@ export const upsertPredictionController = async (req, res) => {
     status: 200,
     message: 'Прогноз успешно сохранен!',
     data: result,
+  });
+};
+
+export const getMatchesWithPredictionsController = async (req, res) => {
+  const userId = req.user._id;
+  const { league } = req.query;
+
+  const matches = await getMatchesWithPredictions(userId, league || 'WC2026');
+
+  res.status(200).json({
+    status: 200,
+    message: 'Success',
+    data: matches,
   });
 };
