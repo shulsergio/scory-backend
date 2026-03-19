@@ -1,6 +1,6 @@
 import createHttpError from 'http-errors';
-import { MatchesCollection } from '../db/models/matches';
-import { PredictorsCollection } from '../db/models/predictors';
+import { MatchesCollection } from '../db/models/matches.js';
+import { PredictorsCollection } from '../db/models/predictors.js';
 
 export const upsertPrediction = async ({
   userId,
