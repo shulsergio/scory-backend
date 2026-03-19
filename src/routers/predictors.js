@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/authenticate';
-import { ctrlWrapper } from '../utils/ctrlWrapper';
+import { authenticate } from '../middleware/authenticate.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   getMatchesWithPredictionsController,
   upsertPredictionController,
-} from '../controllers/predictors';
+} from '../controllers/predictors.js';
 
 const predictorsRouter = Router();
 

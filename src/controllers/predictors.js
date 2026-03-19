@@ -2,7 +2,7 @@ import createHttpError from 'http-errors';
 import {
   getMatchesWithPredictions,
   upsertPrediction,
-} from '../service/predictors';
+} from '../service/predictors.js';
 
 export const upsertPredictionController = async (req, res) => {
   const userId = req.user._id;
