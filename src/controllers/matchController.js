@@ -15,7 +15,7 @@ export const finishAndCalculateMatch = async (req, res) => {
   try {
     const predictions = await PredictorsCollection.find({
       matchId: new ObjectId(matchId),
-      calculated: false,
+      isCalculated: false,
     }).lean();
 
     // Теперь predictions — это обычный массив [{}, {}, ...]
@@ -45,7 +45,7 @@ export const finishAndCalculateMatch = async (req, res) => {
       predictionUpdates.push({
         updateOne: {
           filter: { _id: pred._id },
-          update: { $set: { points, calculated: true } },
+          update: { $set: { points, isCalculated: true } },
         },
       });
 
