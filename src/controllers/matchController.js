@@ -7,7 +7,7 @@ export const finishAndCalculateMatch = async (req, res) => {
   const { logKey, homeScore, awayScore } = req.body;
   const { matchId } = req.params;
 
-  if (logKey !== process.env.SCORE_KEY) {
+  if (logKey !== process.env.SCORE_KEY?.trim()) {
     console.log('Security');
     return res.status(403).json({ error: 'Неверный ключ.' });
   }
