@@ -1,0 +1,71 @@
+import { MatchesCollection } from '../db/models/matches.js';
+import { calculatePoints } from '../service/scoring.js';
+import { UsersCollection } from '../db/models/users.js';
+import { PredictorsCollection } from '../db/models/predictors.js';
+
+export const finishAndCalculateMatch = async (req, res) => {
+  const { logKey, homeScore, awayScore } = req.body;
+  const { matchId } = req.params;
+
+  if (logKey !== process.env.SCORE_KEY) {
+    console.log('Security');
+    return res.status(403).json({ error: 'Неверный ключ.' });
+  }
+  try {
+    const predictions = await PredictorsCollection.find({
+      matchId,
+      calculated: false,
+    });
+
+    if (predictions.length === 0) {
+      return res
+        .status(200)
+        .json({ message: 'Прогнозов нет, просто закрываем матч.' });
+    }
+
+    // ОБНОВА ПАКЕТОМ!!!
+    const predictionUpdates = [];
+    const userUpdates = [];
+
+    predictions.forEach((pred) => {
+      const points = calculatePoints(
+        pred.homeGoals,
+        pred.awayGoals,
+        homeScore,
+        awayScore,
+      );
+
+      // Обновление прогноза
+      predictionUpdates.push({
+        updateOne: {
+          filter: { _id: pred._id },
+          update: { $set: { points, calculated: true } },
+        },
+      });
+
+      // Обновление общего счета юзера
+      userUpdates.push({
+        updateOne: {
+          filter: { _id: pred.userId },
+          update: { $inc: { totalPoints: points } },
+        },
+      });
+    });
+
+    // 3. Выполняем всё в базе
+    await PredictorsCollection.bulkWrite(predictionUpdates);
+    await UsersCollection.bulkWrite(userUpdates);
+
+    // 4. Обновляем статус матча
+    await MatchesCollection.findByIdAndUpdate(matchId, {
+      homeScore,
+      awayScore,
+      status: 'finished',
+      calculated: true,
+    });
+
+    res.status(200).json({ success: true, processed: predictions.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
