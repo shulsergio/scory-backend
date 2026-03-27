@@ -2,25 +2,23 @@ import { MatchesCollection } from '../db/models/matches.js';
 import { calculatePoints } from '../service/scoring.js';
 import { UsersCollection } from '../db/models/users.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
+import { ObjectId } from 'mongodb';
 
 export const finishAndCalculateMatch = async (req, res) => {
   const { logKey, homeScore, awayScore } = req.body;
   const { matchId } = req.params;
 
-  console.log('---logKey---', logKey);
-  console.log(
-    '---process.env.SCORE_KEY?.trim()---',
-    process.env.SCORE_KEY?.trim(),
-  );
   if (logKey !== process.env.SCORE_KEY?.trim()) {
     console.log('Security');
     return res.status(403).json({ error: 'Неверный ключ.' });
   }
   try {
     const predictions = await PredictorsCollection.find({
-      matchId,
+      matchId: new ObjectId(matchId),
       calculated: false,
-    });
+    }).toArray();
+    console.log('---matchId---', matchId);
+    console.log('---predictions---', predictions);
 
     if (predictions.length === 0) {
       return res
