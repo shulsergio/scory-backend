@@ -16,7 +16,10 @@ export const finishAndCalculateMatch = async (req, res) => {
     const predictions = await PredictorsCollection.find({
       matchId: new ObjectId(matchId),
       calculated: false,
-    }).toArray();
+    }).lean();
+
+    // Теперь predictions — это обычный массив [{}, {}, ...]
+    console.log('---Найдено прогнозов---', predictions.length);
     console.log('---matchId---', matchId);
     console.log('---predictions---', predictions);
 
