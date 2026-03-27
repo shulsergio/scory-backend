@@ -78,10 +78,12 @@ export const finishAndCalculateMatch = async (req, res) => {
 
     // 4. Обновляем статус матча
     await MatchesCollection.findByIdAndUpdate(matchId, {
-      homeScore,
-      awayScore,
+      score: {
+        home: homeScore,
+        away: awayScore,
+      },
       status: 'finished',
-      calculated: true,
+      isCalculated: true,
     });
 
     res.status(200).json({ success: true, processed: predictions.length });
