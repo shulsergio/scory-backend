@@ -2,6 +2,8 @@ import { MatchesCollection } from '../db/models/matches.js';
 import { calculatePoints } from '../service/scoring.js';
 import { UsersCollection } from '../db/models/users.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
+import { LeaguesCollection } from '../db/models/leagues.js';
+
 import { ObjectId } from 'mongodb';
 
 export const finishAndCalculateMatch = async (req, res) => {
@@ -13,6 +15,14 @@ export const finishAndCalculateMatch = async (req, res) => {
     return res.status(403).json({ error: 'Неверный ключ.' });
   }
   try {
+    const match = await MatchesCollection.findById(matchId).lean();
+    if (!match) return res.status(404).json({ error: 'Матч не найден' });
+    const activeLeagues = await LeaguesCollection.find({
+      tournament: match.league,
+    }).select('_id');
+
+    const activeLeagueIds = activeLeagues.map((l) => l._id);
+
     const predictions = await PredictorsCollection.find({
       $or: [{ matchId: matchId }, { matchId: new ObjectId(matchId) }],
       isCalculated: { $ne: true },
@@ -21,6 +31,7 @@ export const finishAndCalculateMatch = async (req, res) => {
     console.log('---Найдено прогнозов---', predictions.length);
     console.log('---matchId---', matchId);
     console.log('---predictions---', predictions);
+    console.log('---activeLeagueIds---', activeLeagueIds);
 
     if (predictions.length === 0) {
       return res
@@ -31,6 +42,7 @@ export const finishAndCalculateMatch = async (req, res) => {
     // ОБНОВА ПАКЕТОМ!!!
     const predictionUpdates = [];
     const userUpdates = [];
+    const membershipUpdates = [];
 
     predictions.forEach((pred) => {
       const points = calculatePoints(
@@ -53,6 +65,15 @@ export const finishAndCalculateMatch = async (req, res) => {
         updateOne: {
           filter: { _id: pred.userId },
           update: { $inc: { points: points } },
+        },
+      });
+      membershipUpdates.push({
+        updateMany: {
+          filter: {
+            userId: pred.userId,
+            leagueId: { $in: activeLeagueIds },
+          },
+          update: { $inc: { totalPoints: points } },
         },
       });
     });

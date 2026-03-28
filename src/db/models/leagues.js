@@ -8,6 +8,10 @@ const LeagueSchema = new Schema(
       trim: true,
       unique: true,
     },
+    tournament: {
+      type: String,
+      default: 'WC2026',
+    },
     adminId: {
       type: Schema.Types.ObjectId,
       ref: 'users',
