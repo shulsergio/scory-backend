@@ -28,4 +28,4 @@ const LeagueSchema = new Schema(
   },
 );
 
-export const LeagueCollection = model('leagues', LeagueSchema);
+export const LeaguesCollection = model('leagues', LeagueSchema);

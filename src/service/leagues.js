@@ -1,4 +1,4 @@
-import { LeagueCollection } from '../db/models/leagues.js';
+import { LeaguesCollection } from '../db/models/leagues.js';
 import { MembershipCollection } from '../db/models/memberships.js';
 import createHttpError from 'http-errors';
 
@@ -10,7 +10,7 @@ import createHttpError from 'http-errors';
  */
 export const createLeague = async (name, adminId) => {
   try {
-    const newLeague = await LeagueCollection.create({
+    const newLeague = await LeaguesCollection.create({
       name,
       adminId,
     });
@@ -36,7 +36,7 @@ export const createLeague = async (name, adminId) => {
  * @returns
  */
 export const getLeagueResults = async (leagueId) => {
-  const league = await LeagueCollection.findById(leagueId).lean();
+  const league = await LeaguesCollection.findById(leagueId).lean();
   if (!league) {
     throw createHttpError(404, 'Лига не найдена');
   }
@@ -87,7 +87,7 @@ export const getUserLeagues = async (userId) => {
 };
 
 export const joinLeagueService = async (leagueId, userId) => {
-  const league = await LeagueCollection.findById(leagueId);
+  const league = await LeaguesCollection.findById(leagueId);
   if (!league) {
     throw createHttpError(404, 'League not found');
   }
@@ -107,7 +107,7 @@ export const joinLeagueService = async (leagueId, userId) => {
 };
 
 export const leaveLeagueService = async (leagueId, userId) => {
-  const league = await LeagueCollection.findById(leagueId);
+  const league = await LeaguesCollection.findById(leagueId);
 
   if (!league) throw createHttpError(404, 'League not found');
 

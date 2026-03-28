@@ -6,7 +6,7 @@ import {
   joinLeagueService,
   leaveLeagueService,
 } from '../service/leagues.js';
-import { LeagueCollection } from '../db/models/leagues.js';
+import { LeaguesCollection } from '../db/models/leagues.js';
 
 /**
  * --контроллер для создания Лиги--
@@ -89,7 +89,7 @@ export const getUserLeaguesController = async (req, res) => {
 };
 
 export const getListOfAllLeaguesController = async (req, res) => {
-  const leagues = await LeagueCollection.aggregate([
+  const leagues = await LeaguesCollection.aggregate([
     {
       $lookup: {
         from: 'memberships',
