@@ -3,6 +3,7 @@ import { calculatePoints } from '../service/scoring.js';
 import { UsersCollection } from '../db/models/users.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
 import { LeaguesCollection } from '../db/models/leagues.js';
+import { MembershipCollection } from '../db/models/memberships.js';
 
 import { ObjectId } from 'mongodb';
 
@@ -81,7 +82,9 @@ export const finishAndCalculateMatch = async (req, res) => {
     // 3. Выполняем всё в базе
     await PredictorsCollection.bulkWrite(predictionUpdates);
     await UsersCollection.bulkWrite(userUpdates);
-
+    if (membershipUpdates.length > 0) {
+      await MembershipCollection.bulkWrite(membershipUpdates);
+    }
     // 4. Обновляем статус матча
     await MatchesCollection.findByIdAndUpdate(matchId, {
       score: {
