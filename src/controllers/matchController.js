@@ -4,6 +4,7 @@ import { UsersCollection } from '../db/models/users.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
 import { LeaguesCollection } from '../db/models/leagues.js';
 import { MembershipCollection } from '../db/models/memberships.js';
+import { TournamentStatsCollection } from '../db/models/tournamentStats.js';
 
 import { ObjectId } from 'mongodb';
 
@@ -18,8 +19,9 @@ export const finishAndCalculateMatch = async (req, res) => {
   try {
     const match = await MatchesCollection.findById(matchId).lean();
     if (!match) return res.status(404).json({ error: 'Матч не найден' });
+    const tournamentTag = match.league;
     const activeLeagues = await LeaguesCollection.find({
-      tournament: match.league,
+      tournament: tournamentTag,
     }).select('_id');
 
     const activeLeagueIds = activeLeagues.map((l) => l._id);
@@ -44,6 +46,7 @@ export const finishAndCalculateMatch = async (req, res) => {
     const predictionUpdates = [];
     const userUpdates = [];
     const membershipUpdates = [];
+    const tournamentUpdates = [];
 
     predictions.forEach((pred) => {
       const points = calculatePoints(
@@ -53,7 +56,7 @@ export const finishAndCalculateMatch = async (req, res) => {
         awayScore,
       );
 
-      // Обновление прогноза
+      //------
       predictionUpdates.push({
         updateOne: {
           filter: { _id: pred._id },
@@ -61,13 +64,14 @@ export const finishAndCalculateMatch = async (req, res) => {
         },
       });
 
-      // Обновление общего счета юзера
+      //------
       userUpdates.push({
         updateOne: {
           filter: { _id: pred.userId },
           update: { $inc: { points: points } },
         },
       });
+      //------
       membershipUpdates.push({
         updateMany: {
           filter: {
@@ -77,11 +81,23 @@ export const finishAndCalculateMatch = async (req, res) => {
           update: { $inc: { totalPoints: points } },
         },
       });
+
+      //------
+      tournamentUpdates.push({
+        updateOne: {
+          filter: { userId: pred.userId, tournament: tournamentTag },
+          update: { $inc: { points: points, matchesPredicted: 1 } },
+          upsert: true,
+        },
+      });
     });
 
-    // 3. Выполняем всё в базе
-    await PredictorsCollection.bulkWrite(predictionUpdates);
-    await UsersCollection.bulkWrite(userUpdates);
+    //------
+    await Promise.all([
+      PredictorsCollection.bulkWrite(predictionUpdates),
+      UsersCollection.bulkWrite(userUpdates),
+      TournamentStatsCollection.bulkWrite(tournamentUpdates),
+    ]);
     if (membershipUpdates.length > 0) {
       await MembershipCollection.bulkWrite(membershipUpdates);
     }
