@@ -1,4 +1,4 @@
-import { TournamentStatsCollection } from '../db/models/tournamentStats';
+import { TournamentStatsCollection } from '../db/models/tournamentStats.js';
 
 export const getRankingService = async (tournamentTag) => {
   const topPlayers = await TournamentStatsCollection.find({

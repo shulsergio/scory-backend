@@ -1,4 +1,4 @@
-import { getRankingService } from '../service/ranking';
+import { getRankingService } from '../service/ranking.js';
 
 export const getRankingController = async (req, res) => {
   const { tournamentTag } = req.params;
