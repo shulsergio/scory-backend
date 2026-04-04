@@ -7,7 +7,7 @@ export const getRankingController = async (req, res) => {
     const top50 = await getRankingService(tournamentTag);
 
     if (!top50 || top50.length === 0) {
-      return res.status(200).json({ message: 'Рейтинг пока пуст', data: [] });
+      return res.status(200).json([]); // Возвращаем просто пустой массив
     }
 
     res.status(200).json(top50);
