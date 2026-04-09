@@ -4,6 +4,6 @@ import { Router } from 'express';
 
 const groupsRouter = Router();
 
-groupsRouter.get('/', ctrlWrapper(getAllGroupsController));
+groupsRouter.get('/:tournamentTag', ctrlWrapper(getAllGroupsController));
 
 export default groupsRouter;
