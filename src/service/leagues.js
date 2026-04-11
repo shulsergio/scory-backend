@@ -53,6 +53,7 @@ export const getLeagueResults = async (leagueId) => {
       .filter((m) => m.userId)
       .map((m) => ({
         nickname: m.userId.userNickname,
+        id: m.userId._id,
         points: m.totalPoints,
         joinedAt: m.joinedAt,
       })),
