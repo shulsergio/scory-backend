@@ -18,6 +18,10 @@ export const getUserProfileData = async (userId) => {
     .populate({
       path: 'matchId',
       select: 'homeTeam awayTeam score status league',
+      populate: [
+        { path: 'homeTeam', select: 'name' },
+        { path: 'awayTeam', select: 'name' },
+      ],
     })
     .lean();
 
