@@ -1,6 +1,6 @@
 import { MatchesCollection } from '../db/models/matches.js';
 import { calculatePoints } from '../service/scoring.js';
-import { UsersCollection } from '../db/models/users.js';
+// import { UsersCollection } from '../db/models/users.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
 import { LeaguesCollection } from '../db/models/leagues.js';
 import { MembershipCollection } from '../db/models/memberships.js';
@@ -44,7 +44,7 @@ export const finishAndCalculateMatch = async (req, res) => {
 
     // ОБНОВА ПАКЕТОМ!!!
     const predictionUpdates = [];
-    const userUpdates = [];
+    // const userUpdates = [];--- юзера не обновляю (удалить с коллекции)
     const membershipUpdates = [];
     const tournamentUpdates = [];
 
@@ -55,7 +55,9 @@ export const finishAndCalculateMatch = async (req, res) => {
         homeScore,
         awayScore,
       );
-
+      const isExact =
+        pred.homeGoals === homeScore && pred.awayGoals === awayScore;
+      const isOutcome = points > 0 && !isExact;
       //------
       predictionUpdates.push({
         updateOne: {
@@ -65,12 +67,13 @@ export const finishAndCalculateMatch = async (req, res) => {
       });
 
       //------
-      userUpdates.push({
-        updateOne: {
-          filter: { _id: pred.userId },
-          update: { $inc: { points: points } },
-        },
-      });
+      // Блок не нужен для обновления!!!!
+      // userUpdates.push({
+      //   updateOne: {
+      //     filter: { _id: pred.userId },
+      //     update: { $inc: { points: points } },
+      //   },
+      // });
       //------
       membershipUpdates.push({
         updateMany: {
@@ -86,17 +89,26 @@ export const finishAndCalculateMatch = async (req, res) => {
       tournamentUpdates.push({
         updateOne: {
           filter: { userId: pred.userId, tournament: tournamentTag },
-          update: { $inc: { points: points, matchesPredicted: 1 } },
+          update: {
+            $inc: {
+              points: points,
+              matchesPredicted: 1,
+              exactScores: isExact ? 1 : 0, // +1 если угадал точно
+              correctOutcomes: isOutcome ? 1 : 0, // +1 если только исход
+            },
+          },
           upsert: true,
         },
       });
+
+      //------
     });
 
     //------
     await Promise.all([
       PredictorsCollection.bulkWrite(predictionUpdates),
-      UsersCollection.bulkWrite(userUpdates),
       TournamentStatsCollection.bulkWrite(tournamentUpdates),
+      // UsersCollection.bulkWrite(userUpdates), - не нужен, юзера не обновляю
     ]);
     if (membershipUpdates.length > 0) {
       await MembershipCollection.bulkWrite(membershipUpdates);

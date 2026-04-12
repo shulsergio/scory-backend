@@ -9,7 +9,7 @@ const TournamentStatsSchema = new Schema(
       index: true,
     },
     tournament: {
-      type: String, // Например, 'WC2026'
+      type: String, // 'WC2026', 'UCL2026'
       required: true,
       index: true,
     },
@@ -17,7 +17,11 @@ const TournamentStatsSchema = new Schema(
       type: Number,
       default: 0,
     },
-    // Поля для будущих "фишек"
+    rank: {
+      type: Number,
+      default: 0,
+    },
+    // Позволит рисовать стрелочки ↑ ↓ (поднялся/упал в рейтинге)
     prevRank: {
       type: Number,
       default: 0,
@@ -25,6 +29,14 @@ const TournamentStatsSchema = new Schema(
     matchesPredicted: {
       type: Number,
       default: 0,
+    },
+    exactScores: {
+      type: Number,
+      default: 0, // Сколько раз угадал ТОЧНЫЙ счет
+    },
+    correctOutcomes: {
+      type: Number,
+      default: 0, // Сколько раз угадал только исход (П1, Х, П2)
     },
   },
   {
@@ -34,7 +46,6 @@ const TournamentStatsSchema = new Schema(
 );
 
 TournamentStatsSchema.index({ tournament: 1, points: -1 });
-
 TournamentStatsSchema.index({ userId: 1, tournament: 1 }, { unique: true });
 
 export const TournamentStatsCollection = model(
