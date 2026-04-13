@@ -4,7 +4,7 @@ import { UsersCollection } from '../db/models/users.js';
 
 export const getUserProfileData = async (userId) => {
   const user = await UsersCollection.findById(userId)
-    .select('nickname createdAt')
+    .select('userName userNickname lastVisit createdAt')
     .lean();
   if (!user) return null;
 
@@ -27,7 +27,9 @@ export const getUserProfileData = async (userId) => {
 
   return {
     user: {
-      nickname: user.nickname,
+      nickname: user.userNickname,
+      userName: user.userName,
+      lastVisit: user.lastVisit,
       memberSince: user.createdAt,
     },
     stats: tournamentStats.map((s) => ({
