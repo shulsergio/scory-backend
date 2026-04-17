@@ -7,19 +7,34 @@ const LeagueSchema = new Schema(
       required: true,
       trim: true,
       unique: true,
+      minlength: 3,
+      maxlength: 25,
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 150,
+      default: '',
     },
     tournament: {
-      type: String,
-      default: 'WC2026',
+      type: Schema.Types.ObjectId,
+      ref: 'tournaments',
+      required: true,
     },
     adminId: {
       type: Schema.Types.ObjectId,
       ref: 'users',
       required: true,
     },
+    members: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'users',
+      },
+    ],
     avatarUrl: {
       type: String,
-      // default: 'league-avatar.png',
+      default: '',
     },
   },
   {
