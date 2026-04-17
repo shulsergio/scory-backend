@@ -8,11 +8,19 @@ import createHttpError from 'http-errors';
  * @param {*} adminId -- id администратора лиги
  * @returns -- новая лига
  */
-export const createLeague = async (name, adminId) => {
+export const createLeague = async ({
+  name,
+  description,
+  tournament,
+  adminId,
+}) => {
   try {
     const newLeague = await LeaguesCollection.create({
       name,
+      description,
+      tournament,
       adminId,
+      members: [adminId],
     });
 
     await MembershipCollection.create({
@@ -24,7 +32,7 @@ export const createLeague = async (name, adminId) => {
     return newLeague;
   } catch (error) {
     if (error.code === 11000) {
-      throw createHttpError(409, `Лига "${name}" уже существует`);
+      throw createHttpError(409, `"${name}" already exists`);
     }
     throw error;
   }

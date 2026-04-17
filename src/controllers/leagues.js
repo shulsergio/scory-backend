@@ -20,13 +20,23 @@ import { LeaguesCollection } from '../db/models/leagues.js';
  * @return {*}
  */
 export const createLeagueController = async (req, res) => {
-  const { name } = req.body;
+  const { name, description, tournament } = req.body;
   const adminId = req.user._id;
-  if (!name || name.trim() === '') {
-    throw createHttpError(400, 'Название лиги не может быть пустым');
+
+  if (!name || name.trim().length < 3) {
+    throw createHttpError(400, 'min 3 words');
   }
 
-  const league = await createLeague(name, adminId);
+  if (!tournament) {
+    throw createHttpError(400, 'Need add tournament');
+  }
+
+  const league = await createLeague({
+    name: name.trim(),
+    description: description?.trim(),
+    tournament,
+    adminId,
+  });
 
   res.status(201).json({
     status: 201,
