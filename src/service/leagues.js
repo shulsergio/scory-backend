@@ -44,9 +44,12 @@ export const createLeague = async ({
  * @returns
  */
 export const getLeagueResults = async (leagueId) => {
-  const league = await LeaguesCollection.findById(leagueId).lean();
+  const league = await LeaguesCollection.findById(leagueId)
+    .populate('tournament', 'name slug')
+    .lean();
+
   if (!league) {
-    throw createHttpError(404, 'Лига не найдена');
+    throw createHttpError(404, 'League not found');
   }
 
   const members = await MembershipCollection.find({ leagueId })
@@ -55,15 +58,24 @@ export const getLeagueResults = async (leagueId) => {
     .lean();
 
   return {
+    id: league._id,
     leagueName: league.name,
+    description: league.description || '',
     adminId: league.adminId,
+    avatarUrl: league.avatarUrl || null,
+
+    tournament: {
+      name: league.tournament?.name || 'No tournament',
+      slug: league.tournament?.slug || null,
+    },
+
     leaderboard: members
       .filter((m) => m.userId)
       .map((m) => ({
-        nickname: m.userId.userNickname,
         id: m.userId._id,
+        nickname: m.userId.userNickname,
         points: m.totalPoints,
-        joinedAt: m.joinedAt,
+        joinedAt: m.createdAt,
       })),
   };
 };
@@ -77,20 +89,25 @@ export const getLeagueResults = async (leagueId) => {
 
 export const getUserLeagues = async (userId) => {
   const memberships = await MembershipCollection.find({ userId })
-    .populate('leagueId')
+    .populate({
+      path: 'leagueId',
+      populate: {
+        path: 'tournament',
+        select: 'name slug',
+      },
+    })
     .lean();
 
-  if (!memberships || !Array.isArray(memberships)) return [];
+  if (!memberships) return [];
 
   return memberships
-    .filter((m) => {
-      return m.leagueId && typeof m.leagueId === 'object' && m.leagueId._id;
-    })
+    .filter((m) => m.leagueId && typeof m.leagueId === 'object')
     .map((m) => ({
       leagueId: m.leagueId._id,
       leagueName: m.leagueId.name || 'Название не указано',
       leagueAvatar: m.leagueId.avatarUrl || null,
-      tournament: m.leagueId.tournament,
+      tournamentName: m.leagueId.tournament?.name || 'No tournament',
+      tournamentSlug: m.leagueId.tournament?.slug || null,
       totalPoints: m.totalPoints || 0,
       adminId: m.leagueId.adminId || null,
     }));
