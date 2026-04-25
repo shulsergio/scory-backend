@@ -39,8 +39,8 @@ export const createLeague = async ({
 };
 
 /**
- * --сервис для получения результатов группы--
- * @param {*} leagueId -- идентификатор группы
+ * --сервис для получения результатов лиги и юзеров лиги--
+ * @param {*} leagueId -- идентификатор лиги
  * @returns
  */
 export const getLeagueResults = async (leagueId) => {
@@ -64,10 +64,8 @@ export const getLeagueResults = async (leagueId) => {
     adminId: league.adminId,
     avatarUrl: league.avatarUrl || null,
 
-    tournament: {
-      name: league.tournament?.name || 'No tournament',
-      slug: league.tournament?.slug || null,
-    },
+    tournamentName: league.tournament?.name || 'No tournament',
+    tournamentSlug: league.tournament?.slug || null,
 
     leaderboard: members
       .filter((m) => m.userId)
