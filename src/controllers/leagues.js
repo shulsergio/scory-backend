@@ -82,7 +82,7 @@ export const getUserLeaguesController = async (req, res) => {
     }
 
     const leagues = await getUserLeagues(userId);
-
+    console.log('Final leagues data:', leagues);
     res.status(200).json({
       status: 200,
       message: 'Лиги пользователя успешно получены',
