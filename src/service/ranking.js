@@ -6,18 +6,15 @@ export const getRankingService = async (tournamentTag) => {
   })
     .sort({ points: -1 })
     .limit(50)
-    .populate('userId', 'username avatarUrl')
+    .populate('userId', 'userName userNickname')
     .lean();
 
   return topPlayers.map((player, index) => ({
-    ...player,
+    id: player._id,
     rank: index + 1,
-    user: player.userId
-      ? {
-          username: player.userId.username,
-          avatarUrl: player.userId.avatarUrl,
-        }
-      : null,
-    userId: player.userId?._id || player.userId,
+    points: player.points,
+    userId: player.userId?._id || null,
+    userName: player.userId?.userName || '',
+    userNickname: player.userId?.userNickname || null,
   }));
 };
