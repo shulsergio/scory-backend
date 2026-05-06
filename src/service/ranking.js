@@ -13,6 +13,8 @@ export const getRankingService = async (tournamentTag) => {
     id: player._id,
     rank: index + 1,
     points: player.points,
+    matchesPredicted: player.matchesPredicted,
+    exactScores: player.exactScores,
     userId: player.userId?._id || null,
     userName: player.userId?.userName || '',
     userNickname: player.userId?.userNickname || null,
