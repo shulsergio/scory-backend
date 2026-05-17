@@ -154,3 +154,21 @@ export const leaveLeagueService = async (leagueId, userId) => {
 
   return { message: 'Success' };
 };
+
+export const updateLeagueDescriptionService = async (
+  leagueId,
+  userId,
+  description,
+) => {
+  const league = await LeaguesCollection.findById(leagueId);
+  if (!league) throw createHttpError(404, 'League not found');
+  if (league.adminId.toString() !== userId.toString()) {
+    throw createHttpError(
+      403,
+      'Only the league admin can update the description',
+    );
+  }
+  league.description = description || '';
+  await league.save();
+  return league;
+};

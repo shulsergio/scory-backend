@@ -6,6 +6,7 @@ import {
   getUserLeaguesController,
   joinLeagueController,
   leaveLeagueController,
+  updateLeagueDescriptionController,
 } from '../controllers/leagues.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { authenticate } from '../middleware/authenticate.js';
@@ -43,4 +44,15 @@ leaguesRouter.delete(
   ctrlWrapper(leaveLeagueController),
 );
 
+leaguesRouter.delete(
+  '/:leagueId/leave',
+  authenticate,
+  ctrlWrapper(leaveLeagueController),
+);
+
+leaguesRouter.patch(
+  '/:leagueId',
+  authenticate,
+  ctrlWrapper(updateLeagueDescriptionController),
+);
 export default leaguesRouter;

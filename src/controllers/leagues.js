@@ -5,6 +5,7 @@ import {
   getUserLeagues,
   joinLeagueService,
   leaveLeagueService,
+  updateLeagueDescriptionService,
 } from '../service/leagues.js';
 import { LeaguesCollection } from '../db/models/leagues.js';
 
@@ -150,5 +151,30 @@ export const leaveLeagueController = async (req, res) => {
     status: 200,
     message: 'Successfully left the league!',
     data: result,
+  });
+};
+
+export const updateLeagueDescriptionController = async (req, res) => {
+  const { leagueId } = req.params;
+  const { description } = req.body;
+  const userId = req.user._id;
+
+  if (!userId) {
+    return res.status(401).json({ message: 'User not found' });
+  }
+
+  const updatedLeague = await updateLeagueDescriptionService(
+    leagueId,
+    userId,
+    description,
+  );
+
+  res.status(200).json({
+    status: 200,
+    message: 'Описание лиги успешно обновлено',
+    data: {
+      id: updatedLeague._id,
+      description: updatedLeague.description,
+    },
   });
 };
