@@ -5,7 +5,9 @@ export const getRankingService = async (tournamentTag) => {
   const tournamentDoc = await TournamentsCollection.findOne({
     slug: tournamentTag,
   }).lean();
-
+  console.log(`--Турнир tournamentTag-- ${tournamentTag} `);
+  console.log(`--Турнир tournamentDoc-- ${tournamentDoc?._id} `);
+  console.log(`--Турнир NAME tournamentDoc-- ${tournamentDoc?.name} `);
   if (!tournamentDoc) {
     console.log(`---Турнир ${tournamentTag} не найден в базе---`);
     return [];
