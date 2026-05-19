@@ -9,6 +9,7 @@ export const getUserProfileData = async (userId) => {
   if (!user) return null;
 
   const tournamentStats = await TournamentStatsCollection.find({ userId })
+    .populate('tournament')
     .sort({ points: -1 })
     .lean();
 
@@ -33,7 +34,8 @@ export const getUserProfileData = async (userId) => {
       memberSince: user.createdAt,
     },
     stats: tournamentStats.map((s) => ({
-      tournament: s.tournament,
+      tournamentSlug: s.tournament.slug || 'unknown',
+      tournamentName: s.tournament.name || 'unknown',
       points: s.points,
       rank: s.rank || 0,
       prevRank: s.prevRank || 0,
