@@ -9,7 +9,8 @@ const TournamentStatsSchema = new Schema(
       index: true,
     },
     tournament: {
-      type: String, // 'WC2026', 'UCL2026'
+      type: Schema.Types.ObjectId,
+      ref: 'tournaments',
       required: true,
       index: true,
     },

@@ -19,12 +19,12 @@ export const finishAndCalculateMatch = async (req, res) => {
   try {
     const match = await MatchesCollection.findById(matchId).lean();
     if (!match) return res.status(404).json({ error: 'Матч не найден' });
-    const tournamentTag = match.league;
-    const activeLeagues = await LeaguesCollection.find({
-      tournament: tournamentTag,
-    }).select('_id');
+    const tournamentId = match.tournament;
+const activeLeagues = await LeaguesCollection.find({
+  tournament: tournamentId,
+}).select('_id');
 
-    const activeLeagueIds = activeLeagues.map((l) => l._id);
+const activeLeagueIds = activeLeagues.map((l) => l._id);
 
     const predictions = await PredictorsCollection.find({
       $or: [{ matchId: matchId }, { matchId: new ObjectId(matchId) }],
@@ -86,20 +86,21 @@ export const finishAndCalculateMatch = async (req, res) => {
       });
 
       //------
-      tournamentUpdates.push({
-        updateOne: {
-          filter: { userId: pred.userId, tournament: tournamentTag },
-          update: {
-            $inc: {
-              points: points,
-              matchesPredicted: 1,
-              exactScores: isExact ? 1 : 0, // +1 если угадал точно
-              correctOutcomes: isOutcome ? 1 : 0, // +1 если только исход
-            },
-          },
-          upsert: true,
-        },
-      });
+ tournamentUpdates.push({
+   updateOne: {
+     // Ищем по userId и ObjectId турнира
+     filter: { userId: pred.userId, tournament: tournamentId },
+     update: {
+       $inc: {
+         points: points,
+         matchesPredicted: 1,
+         exactScores: isExact ? 1 : 0,
+         correctOutcomes: isOutcome ? 1 : 0,
+       },
+     },
+     upsert: true,
+   },
+ });
 
       //------
     });

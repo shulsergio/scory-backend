@@ -42,10 +42,10 @@ const matchesSchema = new Schema(
       type: String,
       required: true,
     },
-    league: {
-      type: String,
+    tournament: {
+      type: Schema.Types.ObjectId,
+      ref: 'tournaments',
       required: true,
-      default: 'WC2026',
     },
 
     stadium: {
@@ -63,5 +63,5 @@ const matchesSchema = new Schema(
   },
 );
 
-matchesSchema.index({ league: 1, status: 1 });
+matchesSchema.index({ tournament: 1, status: 1 });
 export const MatchesCollection = model('matches', matchesSchema);

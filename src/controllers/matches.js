@@ -10,7 +10,14 @@ import { MatchesCollection } from '../db/models/matches.js';
  * @return {*}
  */
 export const getAllMatchesController = async (req, res) => {
-  const matches = await MatchesCollection.find({ league: 'WC2026' })
+  const { tournamentId } = req.query;
+
+  const filter = {};
+  if (tournamentId) {
+    filter.tournament = tournamentId;
+  }
+
+  const matches = await MatchesCollection.find(filter)
     .populate('homeTeam')
     .populate('awayTeam')
     .sort({ kickoffTime: 1 });
