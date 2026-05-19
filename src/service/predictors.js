@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import { MatchesCollection } from '../db/models/matches.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
+import { TournamentsCollection } from '../db/models/tournaments.js';
 
 export const upsertPrediction = async ({
   userId,
@@ -34,9 +35,18 @@ export const upsertPrediction = async ({
 };
 
 export const getMatchesWithPredictions = async (userId, league = 'WC2026') => {
+  const tournamentDoc = await TournamentsCollection.findOne({
+    slug: league,
+  }).lean();
+  if (!tournamentDoc) {
+    console.log(`--- Турнир ${league} не найден ---`);
+    return [];
+  }
   const matches = await MatchesCollection.aggregate([
     {
-      $match: { league: league },
+      $match: {
+        tournament: tournamentDoc._id,
+      },
     },
     {
       $lookup: {
