@@ -2,6 +2,7 @@ import createHttpError from 'http-errors';
 import { MatchesCollection } from '../db/models/matches.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
 import { TournamentsCollection } from '../db/models/tournaments.js';
+import mongoose from 'mongoose';
 
 export const upsertPrediction = async ({
   userId,
@@ -46,21 +47,23 @@ export const getMatchesWithPredictions = async (userId, league = 'WC2026') => {
     console.log(`--- Турнир ${league} не найден ---`);
     return [];
   }
+  const targetTournamentId = new mongoose.Types.ObjectId(tournamentDoc._id);
+  const targetUserId = new mongoose.Types.ObjectId(userId);
 
   const testMatch = await MatchesCollection.findOne({
     tournament: tournamentDoc._id,
   }).lean();
   console.log('2. Тестовый матч по ObjectId турнира:', testMatch);
 
-  const testStringMatch = await MatchesCollection.findOne({
-    tournament: league,
-  }).lean();
-  console.log('3. Тестовый матч по строке турнира:', testStringMatch);
+  // const testStringMatch = await MatchesCollection.findOne({
+  //   tournament: league,
+  // }).lean();
+  // console.log('3. Тестовый матч по строке турнира:', testStringMatch);
 
   const matches = await MatchesCollection.aggregate([
     {
       $match: {
-        tournament: tournamentDoc._id,
+        tournament: targetTournamentId, 
       },
     },
     {
@@ -73,7 +76,7 @@ export const getMatchesWithPredictions = async (userId, league = 'WC2026') => {
               $expr: {
                 $and: [
                   { $eq: ['$matchId', '$$matchId'] },
-                  { $eq: ['$userId', userId] },
+                  { $eq: ['$userId', targetUserId] },  
                 ],
               },
             },
