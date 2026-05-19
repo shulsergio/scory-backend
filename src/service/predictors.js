@@ -38,10 +38,25 @@ export const getMatchesWithPredictions = async (userId, league = 'WC2026') => {
   const tournamentDoc = await TournamentsCollection.findOne({
     slug: league,
   }).lean();
+
+  console.log('league (строка с фронта):', league);
+  console.log('Найденный документ турнира:', tournamentDoc);
+
   if (!tournamentDoc) {
     console.log(`--- Турнир ${league} не найден ---`);
     return [];
   }
+
+  const testMatch = await MatchesCollection.findOne({
+    tournament: tournamentDoc._id,
+  }).lean();
+  console.log('2. Тестовый матч по ObjectId турнира:', testMatch);
+
+  const testStringMatch = await MatchesCollection.findOne({
+    tournament: league,
+  }).lean();
+  console.log('3. Тестовый матч по строке турнира:', testStringMatch);
+
   const matches = await MatchesCollection.aggregate([
     {
       $match: {
