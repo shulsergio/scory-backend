@@ -43,7 +43,7 @@ export const createLeague = async ({
  * @param {*} leagueId -- идентификатор лиги
  * @returns
  */
-export const getLeagueResults = async (leagueId) => {
+export const getLeagueResults = async (leagueId, page, limit) => {
   const league = await LeaguesCollection.findById(leagueId)
     .populate('tournament', 'name slug')
     .lean();
@@ -52,10 +52,29 @@ export const getLeagueResults = async (leagueId) => {
     throw createHttpError(404, 'League not found');
   }
 
-  const members = await MembershipCollection.find({ leagueId })
-    .populate('userId', 'userNickname')
-    .sort({ totalPoints: -1 })
-    .lean();
+  const skip = (page - 1) * limit;
+
+  const [membersDocs, totalMembers] = await Promise.all([
+    MembershipCollection.find({ leagueId })
+      .populate('userId', 'userNickname')
+      .sort({ totalPoints: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    MembershipCollection.countDocuments({ leagueId }),
+  ]);
+
+  const totalPages = Math.ceil(totalMembers / limit) || 1;
+
+  const leaderboard = membersDocs
+    .filter((m) => m.userId)
+    .map((m, index) => ({
+      id: m.userId._id,
+      nickname: m.userId.userNickname,
+      points: m.totalPoints,
+      joinedAt: m.createdAt,
+      rank: skip + index + 1,
+    }));
 
   return {
     id: league._id,
@@ -63,18 +82,16 @@ export const getLeagueResults = async (leagueId) => {
     description: league.description || '',
     adminId: league.adminId,
     avatarUrl: league.avatarUrl || null,
-
     tournamentName: league.tournament?.name || 'No tournament',
     tournamentSlug: league.tournament?.slug || null,
 
-    leaderboard: members
-      .filter((m) => m.userId)
-      .map((m) => ({
-        id: m.userId._id,
-        nickname: m.userId.userNickname,
-        points: m.totalPoints,
-        joinedAt: m.createdAt,
-      })),
+    leaderboard,
+    pagination: {
+      totalPlayers: totalMembers,
+      totalPages,
+      currentPage: page,
+      limit,
+    },
   };
 };
 

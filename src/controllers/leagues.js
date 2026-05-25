@@ -57,13 +57,17 @@ export const createLeagueController = async (req, res) => {
 export const getLeagueResultsController = async (req, res) => {
   const { leagueId } = req.params;
 
-  const results = await getLeagueResults(leagueId);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
 
-  res.status(200).json({
-    status: 200,
-    message: 'Результаты лиги успешно получены',
-    data: results,
-  });
+  try {
+    const results = await getLeagueResults(leagueId, page, limit);
+
+    res.status(200).json(results);
+  } catch (error) {
+    const status = error.status || 500;
+    res.status(status).json({ error: error.message });
+  }
 };
 
 /**
