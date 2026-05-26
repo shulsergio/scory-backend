@@ -1,6 +1,11 @@
 // import bcrypt from 'bcrypt';
 // import jwt from 'jsonwebtoken';
+
+import geoip from 'geoip-lite';
+import parser from 'ua-parser-js';
+
 import { REFRESH_TOKEN_TIME } from '../constants/index.js';
+import { LoginHistoryStatsCollection } from '../db/models/loginHistoryStats.js';
 import { UsersCollection } from '../db/models/users.js';
 import { loginUser, logoutUser, registerUser } from '../service/auth.js';
 
@@ -45,9 +50,19 @@ export const registerUserController = async (req, res, next) => {
  */
 export const loginUserController = async (req, res, next) => {
   try {
+    const rawIp = req.ip;
+    const rawUserAgent = req.get('User-Agent');
+
+    // 1. Парсим User-Agent (устройство, ОС, браузер)
+    const ua = parser(rawUserAgent);
+
+    // 2. Определяем геопозицию по IP
+
+    const geo = geoip.lookup(rawIp);
+
     const metadata = {
-      ip: req.ip,
-      userAgent: req.get('User-Agent'),
+      ip: rawIp,
+      userAgent: rawUserAgent,
     };
 
     const session = await loginUser(req.body, metadata);
@@ -57,6 +72,19 @@ export const loginUserController = async (req, res, next) => {
       { lastVisit: new Date() },
       { new: true },
     );
+
+    await LoginHistoryStatsCollection.create({
+      userId: updatedUser._id,
+      userNickname: updatedUser.userNickname,
+      ip: rawIp,
+      country: geo?.country || 'Unknown',
+      city: geo?.city || 'Unknown',
+      deviceType: ua.device.type || 'desktop', // если девайс пустой, ua-parser считает это ПК
+      os: ua.os.name || 'Unknown',
+      browser: ua.browser.name || 'Unknown',
+    });
+
+    // Твой стандартный код кук
     res.cookie('refreshToken', session.refreshToken, {
       httpOnly: true,
       secure: true,
@@ -71,6 +99,7 @@ export const loginUserController = async (req, res, next) => {
       expires: new Date(Date.now() + REFRESH_TOKEN_TIME),
     });
 
+    // Отправляем ответ на фронтенд
     res.status(200).json({
       status: 200,
       message: 'Successfully logged in!',
@@ -79,7 +108,9 @@ export const loginUserController = async (req, res, next) => {
         user: {
           id: updatedUser._id,
           nickname: updatedUser.userNickname,
-          points: updatedUser.points,
+          userName: updatedUser.userName,
+          country: updatedUser.country || '',
+          points: updatedUser.points || 0,
         },
       },
     });
