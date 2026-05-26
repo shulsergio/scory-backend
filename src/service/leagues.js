@@ -56,7 +56,7 @@ export const getLeagueResults = async (leagueId, page, limit) => {
 
   const [membersDocs, totalMembers] = await Promise.all([
     MembershipCollection.find({ leagueId })
-      .populate('userId', 'userNickname')
+      .populate('userId', 'userName userNickname country')
       .sort({ totalPoints: -1 })
       .skip(skip)
       .limit(limit)
@@ -70,10 +70,12 @@ export const getLeagueResults = async (leagueId, page, limit) => {
     .filter((m) => m.userId)
     .map((m, index) => ({
       id: m.userId._id,
+      userName: m.userId.userName,
       nickname: m.userId.userNickname,
       points: m.totalPoints,
       joinedAt: m.createdAt,
       rank: skip + index + 1,
+      country: m.userId.country || null,
     }));
 
   return {

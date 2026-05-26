@@ -19,7 +19,7 @@ export const getRankingService = async (tournamentTag, page = 1, limit = 5) => {
       .sort({ points: -1, exactScores: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('userId', 'userName userNickname')
+      .populate('userId', 'userName userNickname country')
       .lean(),
     TournamentStatsCollection.countDocuments(filter),
   ]);

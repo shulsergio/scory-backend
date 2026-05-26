@@ -5,7 +5,7 @@ import { UsersCollection } from '../db/models/users.js';
 
 export const getUserProfileData = async (userId) => {
   const user = await UsersCollection.findById(userId)
-    .select('userName userNickname lastVisit createdAt')
+    .select('userName userNickname lastVisit createdAt country')
     .lean();
   if (!user) return null;
 
@@ -33,6 +33,7 @@ export const getUserProfileData = async (userId) => {
       userName: user.userName,
       lastVisit: user.lastVisit,
       memberSince: user.createdAt,
+      country: user.country || null,
     },
     stats: tournamentStats.map((s) => ({
       tournamentSlug: s.tournament.slug || 'unknown',
