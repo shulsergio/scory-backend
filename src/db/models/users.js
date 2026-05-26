@@ -8,6 +8,7 @@ const usersSchema = new Schema(
     password: { type: String, required: true },
     points: { type: Number, default: 0 },
     lastVisit: { type: Date, default: Date.now },
+    country: { type: String, default: '' },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
   },
   { timestamps: true, versionKey: false },

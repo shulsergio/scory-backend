@@ -1,3 +1,4 @@
+import createHttpError from 'http-errors';
 import { PredictorsCollection } from '../db/models/predictors.js';
 import { TournamentStatsCollection } from '../db/models/tournamentStats.js';
 import { UsersCollection } from '../db/models/users.js';
@@ -54,4 +55,21 @@ export const getUserProfileData = async (userId) => {
       isCalculated: p.isCalculated,
     })),
   };
+};
+
+export const updateUserSettingsService = async (userId, { name, country }) => {
+  const updatedUser = await UsersCollection.findByIdAndUpdate(
+    userId,
+    {
+      userName: name,
+      country: country,
+    },
+    { new: true },
+  ).lean();
+
+  if (!updatedUser) {
+    throw createHttpError(404, 'Пользователь не найден');
+  }
+
+  return updatedUser;
 };
