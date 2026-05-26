@@ -2,7 +2,7 @@
 // import jwt from 'jsonwebtoken';
 
 import geoip from 'geoip-lite';
-import parser from 'ua-parser-js';
+import * as parser from 'ua-parser-js';
 
 import { REFRESH_TOKEN_TIME } from '../constants/index.js';
 import { LoginHistoryStatsCollection } from '../db/models/loginHistoryStats.js';
@@ -54,7 +54,8 @@ export const loginUserController = async (req, res, next) => {
     const rawUserAgent = req.get('User-Agent');
 
     // 1. Парсим User-Agent (устройство, ОС, браузер)
-    const ua = parser(rawUserAgent);
+    const { UAParser } = parser;
+    const ua = UAParser(rawUserAgent);
 
     // 2. Определяем геопозицию по IP
 
