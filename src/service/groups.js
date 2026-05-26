@@ -2,7 +2,7 @@ import { GroupsCollection } from '../db/models/groups.js';
 
 export const getAllGroupsData = async (tournamentTag) => {
   const standings = await GroupsCollection.find({ tournament: tournamentTag })
-    .populate('team', 'name code')
+    .populate('team', 'name code flagCode')
     .lean();
 
   const grouped = standings.reduce((acc, curr) => {

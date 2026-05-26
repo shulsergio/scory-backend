@@ -4,6 +4,7 @@ const teamsSchema = new Schema(
   {
     name: { type: String, required: true },
     code: { type: String, required: true, unique: true },
+    flagCode: { type: String },
     logoUrl: { type: String },
     league: {
       type: String,
