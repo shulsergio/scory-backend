@@ -46,6 +46,7 @@ export const getRankingService = async (tournamentTag, page = 1, limit = 5) => {
       userId: player.userId?._id || null,
       userName: player.userId?.userName || '',
       userNickname: player.userId?.userNickname || null,
+      country: player.userId?.country || null,
     };
   });
 
