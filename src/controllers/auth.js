@@ -51,16 +51,22 @@ export const registerUserController = async (req, res, next) => {
 export const loginUserController = async (req, res, next) => {
   try {
     const rawIp = req.ip;
-    const rawUserAgent = req.get('User-Agent');
-
-    // 1. Парсим User-Agent (устройство, ОС, браузер)
+    const rawUserAgent = req.get('User-Agent'); // доставем браузер или мобайл ос
+    // console.log('rawUserAgent:', rawUserAgent);
     const { UAParser } = parser;
     const ua = UAParser(rawUserAgent);
+    console.log('Parser ua:', ua);
 
-    // 2. Определяем геопозицию по IP
-
-    const geo = geoip.lookup(rawIp);
-
+    const geo = geoip.lookup(rawIp); // доставем браузер или мобайл ос
+    // { range: [ 3479298048, 3479300095 ],
+    //   country: 'US',
+    //   region: 'TX',
+    //   eu: '0',
+    //   timezone: 'America/Chicago',
+    //   city: 'San Antonio',
+    //   ll: [ 29.4969, -98.4032 ],
+    //   metro: 641,
+    //   area: 1000 }
     const metadata = {
       ip: rawIp,
       userAgent: rawUserAgent,
@@ -78,14 +84,16 @@ export const loginUserController = async (req, res, next) => {
       userId: updatedUser._id,
       userNickname: updatedUser.userNickname,
       ip: rawIp,
+      range: geo?.range || [],
+      ll: geo?.range || [],
       country: geo?.country || 'Unknown',
       city: geo?.city || 'Unknown',
-      deviceType: ua.device.type || 'desktop', // если девайс пустой, ua-parser считает это ПК
+      area: geo?.area || 'Unknown',
+      deviceType: ua.device.type || 'Unknown',
       os: ua.os.name || 'Unknown',
       browser: ua.browser.name || 'Unknown',
     });
 
-    // Твой стандартный код кук
     res.cookie('refreshToken', session.refreshToken, {
       httpOnly: true,
       secure: true,
@@ -100,7 +108,6 @@ export const loginUserController = async (req, res, next) => {
       expires: new Date(Date.now() + REFRESH_TOKEN_TIME),
     });
 
-    // Отправляем ответ на фронтенд
     res.status(200).json({
       status: 200,
       message: 'Successfully logged in!',

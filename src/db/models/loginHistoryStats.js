@@ -15,7 +15,14 @@ const loginHistoryStatsSchema = new Schema(
       type: String,
       required: true,
     },
-    // Геолокация по IP
+    range: {
+      type: [Number],
+      default: [],
+    },
+    ll: {
+      type: [Number],
+      default: [],
+    },
     country: {
       type: String,
       default: 'Unknown',
@@ -24,7 +31,10 @@ const loginHistoryStatsSchema = new Schema(
       type: String,
       default: 'Unknown',
     },
-
+    area: {
+      type: String,
+      default: 'Unknown',
+    },
     deviceType: {
       type: String,
       default: 'Unknown',

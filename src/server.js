@@ -28,7 +28,7 @@ const PORT = Number(env('PORT', '3000'));
 // ------
 export const setupServer = () => {
   const app = express();
-
+  app.set('trust proxy', true);
   app.use(cors(corsOptions));
 
   app.use(express.json());
@@ -52,15 +52,15 @@ export const setupServer = () => {
     res.status(404).json({ message: 'Not found' });
   });
 
-app.use((err, req, res, next) => { 
-  next;
+  app.use((err, req, res, next) => {
+    next;
 
-  res.status(500).json({
-    message: 'Something went wrong',
-    error: err.message,
+    res.status(500).json({
+      message: 'Something went wrong',
+      error: err.message,
+    });
   });
-});
   app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);
   });
-};;;
+};
