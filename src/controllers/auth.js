@@ -154,10 +154,10 @@ export const logoutUserController = async (req, res) => {
 };
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-console.log(
-  '🔥 ПРОВЕРКА КЛЮЧА RESEND:',
-  process.env.RESEND_API_KEY ? 'КЛЮЧ ЕСТЬ' : 'КЛЮЧА НЕТ (UNDEFINED!)',
-);
+// console.log(
+//   '🔥 ПРОВЕРКА КЛЮЧА RESEND:',
+//   process.env.RESEND_API_KEY ? 'КЛЮЧ ЕСТЬ' : 'КЛЮЧА НЕТ (UNDEFINED!)',
+// );
 
 export const forgotPasswordController = async (req, res) => {
   const { email } = req.body;
@@ -165,7 +165,6 @@ export const forgotPasswordController = async (req, res) => {
   try {
     const user = await UsersCollection.findOne({ email });
     if (!user) {
-      // Ради безопасности говорим, что всё ок, даже если юзера нет
       return res
         .status(200)
         .json({ message: 'Если email существует, письмо отправлено.' });
@@ -173,22 +172,26 @@ export const forgotPasswordController = async (req, res) => {
 
     const resetToken = randomBytes(32).toString('hex');
     user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 час в мс
+    user.resetPasswordExpires = Date.now() + 3600000;
     await user.save();
 
-    const resetUrl = `https://your-nextjs-front.com/reset-password?token=${resetToken}`;
+    //  ЛОКАЛЛЛЛ
+
+    const resetUrl = `http://localhost:3001/reset-password?token=${resetToken}`;
+
+    //  ЛОКАЛЛЛЛ
 
     await resend.emails.send({
       from: 'onboarding@resend.dev',
       to: user.email,
-      subject: 'Восстановление пароля',
-      html: `<p>Вы запросили сброс пароля. Перейдите по <a href="${resetUrl}">этой ссылке</a>, чтобы задать новый пароль. Ссылка действительна 1 час.</p>`,
+      subject: 'Password recovery',
+      html: `<p>Password reset procedure. Click <a href="${resetUrl}">here</a> to set a new password. The link is valid for 1 hour.</p>`,
     });
 
-    res.status(200).json({ message: 'Письмо успешно отправлено.' });
+    res.status(200).json({ message: 'OK.' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Ошибка на сервере' });
+    res.status(500).json({ message: 'Error' });
   }
 };
 
@@ -198,13 +201,12 @@ export const resetPasswordController = async (req, res) => {
   try {
     const user = await UsersCollection.findOne({
       resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() },
+      resetPasswordExpires: { $gt: new Date() },
     });
 
     if (!user) {
       return res.status(400).json({
-        message:
-          'Ссылка для сброса пароля недействительна или её срок действия истек.',
+        message: 'The password reset link is invalid or has expired.',
       });
     }
 
@@ -216,13 +218,9 @@ export const resetPasswordController = async (req, res) => {
 
     await user.save();
 
-    return res
-      .status(200)
-      .json({ message: 'Пароль успешно изменен. Теперь вы можете войти.' });
+    return res.status(200).json({ message: 'DONE' });
   } catch (error) {
     console.error('Reset password error:', error);
-    return res
-      .status(500)
-      .json({ message: 'Ошибка на сервере при изменении пароля.' });
+    return res.status(500).json({ message: 'ERROR' });
   }
 };

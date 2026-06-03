@@ -10,6 +10,8 @@ const usersSchema = new Schema(
     lastVisit: { type: Date, default: Date.now },
     country: { type: String, default: '' },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
   },
   { timestamps: true, versionKey: false },
 );
@@ -17,6 +19,8 @@ const usersSchema = new Schema(
 usersSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
+  delete obj.resetPasswordToken;
+  delete obj.resetPasswordExpires;
   return obj;
 };
 
