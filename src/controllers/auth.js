@@ -177,7 +177,7 @@ export const forgotPasswordController = async (req, res) => {
 
     //  ЛОКАЛЛЛЛ
 
-    const resetUrl = `http://localhost:3001/reset-password?token=${resetToken}`;
+    const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
 
     //  ЛОКАЛЛЛЛ
 
