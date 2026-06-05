@@ -38,6 +38,25 @@ export const registerUserController = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error in registerUserController:', error);
+
+    if (error.code === 11000 && error.keyValue) {
+      const duplicateField = Object.keys(error.keyValue)[0];
+
+      if (duplicateField === 'email') {
+        return res.status(409).json({
+          status: 409,
+          message: 'This email address is already registered.',
+        });
+      }
+
+      if (duplicateField === 'userNickname') {
+        return res.status(409).json({
+          status: 409,
+          message: 'This nickname is already taken.',
+        });
+      }
+    }
+
     next(error);
   }
 };
@@ -185,7 +204,7 @@ export const forgotPasswordController = async (req, res) => {
       from: 'onboarding@resend.dev',
       to: user.email,
       subject: 'Password recovery',
-      html: `<p>Password reset procedure. Click <a href="${resetUrl}">here</a> to set a new password. The link is valid for 1 hour.</p>`,
+      html: `<p>Password reset procedure. Click <a href="${resetUrl}">here</a> to set a new password. The link is valid for 1 hour.<br/> Перейдіть за <a href="${resetUrl}">цим посиланням</a>, щоб задати новий пароль. Посилання дійсне 1 годину. </p>`,
     });
 
     res.status(200).json({ message: 'OK.' });
