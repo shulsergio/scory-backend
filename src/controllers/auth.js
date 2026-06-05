@@ -39,17 +39,25 @@ export const registerUserController = async (req, res, next) => {
   } catch (error) {
     console.error('Error in registerUserController:', error);
 
-    if (error.code === 11000 && error.keyValue) {
-      const duplicateField = Object.keys(error.keyValue)[0];
+    const isMongoDuplicate = error.code === 11000;
 
-      if (duplicateField === 'email') {
+    const isMongooseDuplicate =
+      error.name === 'MongoServerError' && error.message.includes('E11000');
+
+    if (isMongoDuplicate || isMongooseDuplicate) {
+      const errorString = JSON.stringify(error);
+
+      if (errorString.includes('email')) {
         return res.status(409).json({
           status: 409,
           message: 'This email address is already registered.',
         });
       }
 
-      if (duplicateField === 'userNickname') {
+      if (
+        errorString.includes('userNickname') ||
+        errorString.includes('nickname')
+      ) {
         return res.status(409).json({
           status: 409,
           message: 'This nickname is already taken.',
