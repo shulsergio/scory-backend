@@ -26,6 +26,7 @@ import { loginUser, logoutUser, registerUser } from '../service/auth.js';
 export const registerUserController = async (req, res, next) => {
   try {
     const user = await registerUser(req.body);
+
     res.status(201).json({
       status: 201,
       message: 'User created!',
@@ -39,30 +40,21 @@ export const registerUserController = async (req, res, next) => {
   } catch (error) {
     console.error('Error in registerUserController:', error);
 
-    const isMongoDuplicate = error.code === 11000;
+    if (error.status === 409 || error.statusCode === 409) {
+      return res.status(409).json({
+        status: 409,
+        message: error.message,
+      });
+    }
 
-    const isMongooseDuplicate =
-      error.name === 'MongoServerError' && error.message.includes('E11000');
+    if (error.code === 11000 && error.keyValue) {
+      const duplicateField = Object.keys(error.keyValue)[0];
+      const isEmail = duplicateField === 'email';
 
-    if (isMongoDuplicate || isMongooseDuplicate) {
-      const errorString = JSON.stringify(error);
-
-      if (errorString.includes('email')) {
-        return res.status(409).json({
-          status: 409,
-          message: 'This email address is already registered.',
-        });
-      }
-
-      if (
-        errorString.includes('userNickname') ||
-        errorString.includes('nickname')
-      ) {
-        return res.status(409).json({
-          status: 409,
-          message: 'This nickname is already taken.',
-        });
-      }
+      return res.status(409).json({
+        status: 409,
+        message: isEmail ? 'Email already in use' : 'Nickname already in use',
+      });
     }
 
     next(error);
