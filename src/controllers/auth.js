@@ -12,7 +12,7 @@ import { REFRESH_TOKEN_TIME } from '../constants/index.js';
 import { LoginHistoryStatsCollection } from '../db/models/loginHistoryStats.js';
 import { UsersCollection } from '../db/models/users.js';
 import { loginUser, logoutUser, registerUser } from '../service/auth.js';
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 /**
  * --контроллер для регистрации пользователя--
  * payload - приходящие данные для регистрации пользователя
@@ -25,8 +25,51 @@ import { loginUser, logoutUser, registerUser } from '../service/auth.js';
  */
 export const registerUserController = async (req, res, next) => {
   try {
+    // 1. Регистрируем пользователя в MongoDB
     const user = await registerUser(req.body);
 
+    try {
+      await resend.emails.send({
+        from: 'Welcome <onboarding@resend.dev>', // МОЯ ПОЧТА
+        to: user.email,
+        subject: 'Welcome to Scory!',
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 8px;">
+            <h2 style="color: #333;">Hello, ${user.userNickname}! </h2>
+            <p style="font-size: 16px; color: #555; line-height: 1.5;">
+              Your account has been created successfully. Login: <strong>${user.userNickname}</strong><br/>
+            </p>
+            <p style="font-size: 14px; color: #777;">
+              If you did not register on our project, please ignore this email.
+            </p>
+
+            <p style="font-size: 12px; color: #999; text-align: center;">
+              Best regards, The Scory Team.
+            </p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+  <p style="font-size: 16px; color: #555; line-height: 1.5;">
+              Привіт, ${user.userNickname}!
+            </p>
+  <p style="font-size: 16px; color: #555; line-height: 1.5;">
+              Твій аккаунт успішно створено. Твій логін на сайті: ${user.userNickname}
+            </p>
+            <p style="font-size: 14px; color: #777;">
+              Якщо ти не реєструвався на нашому проекті, просто проігноруй цей лист.
+            </p>
+
+            <p style="font-size: 12px; color: #999; text-align: center;">
+              Best regards, The Scory Team.
+            </p>
+
+          </div>
+        `,
+      });
+      // console.log(`отправлено на ${user.email}`);
+    } catch (emailError) {
+      console.error('Email error:', emailError);
+    }
+
+    // 3. Возвращаем успешный ответ фронтенду
     res.status(201).json({
       status: 201,
       message: 'User created!',
@@ -75,7 +118,7 @@ export const loginUserController = async (req, res, next) => {
   try {
     const rawIp = req.ip;
     const rawUserAgent = req.get('User-Agent'); // доставем браузер или мобайл ос
-    // console.log('rawUserAgent:', rawUserAgent);
+
     const { UAParser } = parser;
     const ua = UAParser(rawUserAgent);
     console.log('Parser ua:', ua);
@@ -171,12 +214,6 @@ export const logoutUserController = async (req, res) => {
 
   res.status(204).send();
 };
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-// console.log(
-//   '🔥 ПРОВЕРКА КЛЮЧА RESEND:',
-//   process.env.RESEND_API_KEY ? 'КЛЮЧ ЕСТЬ' : 'КЛЮЧА НЕТ (UNDEFINED!)',
-// );
 
 export const forgotPasswordController = async (req, res) => {
   const { email } = req.body;
