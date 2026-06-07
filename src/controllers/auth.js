@@ -47,10 +47,10 @@ export const registerUserController = async (req, res, next) => {
               Best regards, The Scory Team.
             </p>
       <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-  <p style="font-size: 16px; color: #555; line-height: 1.5;">
-              Привіт, ${user.userNickname}!
+      <p style="font-size: 16px; color: #555; line-height: 1.5;">
+              Привіт, <strong> ${user.userNickname}!</strong>
             </p>
-  <p style="font-size: 16px; color: #555; line-height: 1.5;">
+            <p style="font-size: 16px; color: #555; line-height: 1.5;">
               Твій аккаунт успішно створено. Твій логін на сайті: ${user.userNickname}
             </p>
             <p style="font-size: 14px; color: #777;">
@@ -241,7 +241,12 @@ export const forgotPasswordController = async (req, res) => {
       from: 'onboarding@resend.dev',
       to: user.email,
       subject: 'Password recovery',
-      html: `<p>Password reset procedure. Click <a href="${resetUrl}">here</a> to set a new password. The link is valid for 1 hour.<br/> Перейдіть за <a href="${resetUrl}">цим посиланням</a>, щоб задати новий пароль. Посилання дійсне 1 годину. </p>`,
+      html: `
+       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 8px;">
+         
+      
+      <p>Password reset procedure. Click <a href="${resetUrl}">here</a> to set a new password. The link is valid for 1 hour.<br/> Перейдіть за <a href="${resetUrl}">цим посиланням</a>, щоб задати новий пароль. Посилання дійсне 1 годину. </p>
+      </div>`,
     });
 
     res.status(200).json({ message: 'OK.' });
