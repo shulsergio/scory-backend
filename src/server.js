@@ -32,8 +32,10 @@ const PORT = Number(env('PORT', '3000'));
 export const setupServer = () => {
   const app = express();
   app.set('trust proxy', true);
+
   app.use(cors(corsOptions));
 
+  app.options('*', cors(corsOptions));
   app.use(express.json());
   app.use(cookieParser());
 
