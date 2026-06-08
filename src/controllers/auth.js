@@ -30,7 +30,7 @@ export const registerUserController = async (req, res, next) => {
 
     try {
       await resend.emails.send({
-        from: 'Welcome <onboarding@resend.dev>', // МОЯ ПОЧТА
+        from: 'Welcome <info@scory.com.ua>', // МОЯ ПОЧТА
         to: user.email,
         subject: 'Welcome to Scory!',
         html: `
@@ -238,7 +238,7 @@ export const forgotPasswordController = async (req, res) => {
     //  ЛОКАЛЛЛЛ
 
     await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'info@scory.com.ua',
       to: user.email,
       subject: 'Password recovery',
       html: `
