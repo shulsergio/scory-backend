@@ -9,6 +9,7 @@ import { env } from './utils/env.js';
 
 const allowedOrigins = [
   'https://scory-game.vercel.app',
+  'https://scory.com.ua',
   'https://scory-game-preview.vercel.app',
   'http://localhost:3000',
   'http://localhost:4000',
