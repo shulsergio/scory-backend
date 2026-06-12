@@ -16,7 +16,7 @@ export const getRankingService = async (tournamentTag, page = 1, limit = 5) => {
 
   const [topPlayers, totalPlayers] = await Promise.all([
     TournamentStatsCollection.find(filter)
-      .sort({ points: -1, exactScores: -1 })
+      .sort({ points: -1, exactScores: -1, _id: 1 })
       .skip(skip)
       .limit(limit)
       .populate('userId', 'userName userNickname country')

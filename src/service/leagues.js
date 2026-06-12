@@ -57,7 +57,7 @@ export const getLeagueResults = async (leagueId, page, limit) => {
   const [membersDocs, totalMembers] = await Promise.all([
     MembershipCollection.find({ leagueId })
       .populate('userId', 'userName userNickname country')
-      .sort({ totalPoints: -1 })
+      .sort({ totalPoints: -1, _id: 1 })
       .skip(skip)
       .limit(limit)
       .lean(),
