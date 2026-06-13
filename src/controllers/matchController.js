@@ -1,5 +1,8 @@
 import { MatchesCollection } from '../db/models/matches.js';
-import { calculatePoints } from '../service/scoring.js';
+import {
+  calculatePoints,
+  getPredictionMatchStatsService,
+} from '../service/scoring.js';
 // import { UsersCollection } from '../db/models/users.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
 import { LeaguesCollection } from '../db/models/leagues.js';
@@ -20,11 +23,11 @@ export const finishAndCalculateMatch = async (req, res) => {
     const match = await MatchesCollection.findById(matchId).lean();
     if (!match) return res.status(404).json({ error: 'Матч не найден' });
     const tournamentId = match.tournament;
-const activeLeagues = await LeaguesCollection.find({
-  tournament: tournamentId,
-}).select('_id');
+    const activeLeagues = await LeaguesCollection.find({
+      tournament: tournamentId,
+    }).select('_id');
 
-const activeLeagueIds = activeLeagues.map((l) => l._id);
+    const activeLeagueIds = activeLeagues.map((l) => l._id);
 
     const predictions = await PredictorsCollection.find({
       $or: [{ matchId: matchId }, { matchId: new ObjectId(matchId) }],
@@ -86,21 +89,21 @@ const activeLeagueIds = activeLeagues.map((l) => l._id);
       });
 
       //------
- tournamentUpdates.push({
-   updateOne: {
-     // Ищем по userId и ObjectId турнира
-     filter: { userId: pred.userId, tournament: tournamentId },
-     update: {
-       $inc: {
-         points: points,
-         matchesPredicted: 1,
-         exactScores: isExact ? 1 : 0,
-         correctOutcomes: isOutcome ? 1 : 0,
-       },
-     },
-     upsert: true,
-   },
- });
+      tournamentUpdates.push({
+        updateOne: {
+          // Ищем по userId и ObjectId турнира
+          filter: { userId: pred.userId, tournament: tournamentId },
+          update: {
+            $inc: {
+              points: points,
+              matchesPredicted: 1,
+              exactScores: isExact ? 1 : 0,
+              correctOutcomes: isOutcome ? 1 : 0,
+            },
+          },
+          upsert: true,
+        },
+      });
 
       //------
     });
@@ -127,5 +130,22 @@ const activeLeagueIds = activeLeagues.map((l) => l._id);
     res.status(200).json({ success: true, processed: predictions.length });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+//--------------------
+//
+export const getPredictionMatchStatsController = async (req, res) => {
+  const { matchId } = req.params;
+
+  if (!matchId) {
+    return res.status(400).json({ error: 'Не указан ID матча.' });
+  }
+
+  try {
+    const result = await getPredictionMatchStatsService(matchId);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
