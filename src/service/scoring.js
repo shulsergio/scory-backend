@@ -1,4 +1,4 @@
-import { PredictorsCollection } from '../db/models/predictors';
+import { PredictorsCollection } from '../db/models/predictors.js';
 
 import { ObjectId } from 'mongodb';
 
