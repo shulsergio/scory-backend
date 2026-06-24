@@ -1,4 +1,4 @@
-import { MatchesCollection } from '../db/models/matches';
+import { MatchesCollection } from '../db/models/matches.js';
 
 export const getMatchByIdData = async (matchId) => {
   const match = await MatchesCollection.findById(matchId)
