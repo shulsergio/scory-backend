@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { getAllMatchesController } from '../controllers/matches.js';
+import {
+  getAllMatchesController,
+  getMatchByIdController,
+} from '../controllers/matches.js';
 import {
   finishAndCalculateMatch,
   getPredictionMatchStatsController,
@@ -10,6 +13,8 @@ const matchesRouter = Router();
 
 matchesRouter.get('/', ctrlWrapper(getAllMatchesController));
 // matchesRouter.post('/', ctrlWrapper());
+
+matchesRouter.get('/:matchId', ctrlWrapper(getMatchByIdController));
 
 matchesRouter.post('/calculate/:matchId', finishAndCalculateMatch);
 matchesRouter.get(

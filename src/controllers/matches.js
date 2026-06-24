@@ -1,5 +1,7 @@
+import createHttpError from 'http-errors';
 import { MatchesCollection } from '../db/models/matches.js';
 import NodeCache from 'node-cache';
+import { getMatchByIdData } from '../service/matches.js';
 /**
  *--контроллер для получения всех матчей--
  * Получает все матчи из базы данных и возвращает их в ответе.
@@ -53,4 +55,20 @@ export const getAllMatchesController = async (req, res) => {
       error: 'Внутренняя ошибка сервера при получении матчей.',
     });
   }
+};
+
+export const getMatchByIdController = async (req, res) => {
+  const { matchId } = req.params;
+
+  const match = await getMatchByIdData(matchId);
+
+  if (!match) {
+    throw createHttpError(404, `Match with ID ${matchId} not found`);
+  }
+
+  res.status(200).json({
+    status: 200,
+    message: 'Match details successfully retrieved!',
+    data: match,
+  });
 };
