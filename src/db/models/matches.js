@@ -10,12 +10,12 @@ const matchesSchema = new Schema(
     homeTeam: {
       type: Schema.Types.ObjectId,
       ref: 'teams',
-      required: true,
+      required: false,
     },
     awayTeam: {
       type: Schema.Types.ObjectId,
       ref: 'teams',
-      required: true,
+      required: false,
     },
 
     kickoffTime: {
