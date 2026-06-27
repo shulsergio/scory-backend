@@ -3,7 +3,7 @@ import { TournamentsCollection } from '../db/models/tournaments.js';
 
 export const getPlayoffMatchesService = async (tournamentTag) => {
   const tournament = await TournamentsCollection.findOne({
-    tag: tournamentTag,
+    slug: tournamentTag,
   }).lean();
 
   if (!tournament) {
