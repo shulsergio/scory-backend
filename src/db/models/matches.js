@@ -40,7 +40,6 @@ const matchesSchema = new Schema(
 
     group: {
       type: String,
-      required: true,
     },
     tournament: {
       type: Schema.Types.ObjectId,
@@ -55,6 +54,17 @@ const matchesSchema = new Schema(
     isCalculated: {
       type: Boolean,
       default: false,
+    },
+
+    isPlayoff: { type: Boolean, default: false },
+    stage: {
+      type: String,
+      enum: ['1/32', '1/16', '1/8', '1/4', '1/2', 'final', null],
+      default: null,
+    },
+    penaltiesScore: {
+      home: { type: Number },
+      away: { type: Number },
     },
   },
   {

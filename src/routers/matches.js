@@ -8,12 +8,15 @@ import {
   finishAndCalculateMatch,
   getPredictionMatchStatsController,
 } from '../controllers/matchController.js';
+import { getPlayoffMatchesController } from '../controllers/playoffController.js';
 
 const matchesRouter = Router();
 
 matchesRouter.get('/', ctrlWrapper(getAllMatchesController));
-// matchesRouter.post('/', ctrlWrapper());
-
+matchesRouter.get(
+  '/tournament/:tournamentTag/playoff',
+  ctrlWrapper(getPlayoffMatchesController),
+);
 matchesRouter.get('/:matchId', ctrlWrapper(getMatchByIdController));
 
 matchesRouter.post('/calculate/:matchId', finishAndCalculateMatch);
