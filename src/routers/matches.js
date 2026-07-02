@@ -3,6 +3,7 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   getAllMatchesController,
   getMatchByIdController,
+  getMatchExactWinnersController,
 } from '../controllers/matches.js';
 import {
   finishAndCalculateMatch,
@@ -18,7 +19,10 @@ matchesRouter.get(
   ctrlWrapper(getPlayoffMatchesController),
 );
 matchesRouter.get('/:matchId', ctrlWrapper(getMatchByIdController));
-
+matchesRouter.get(
+  '/:matchId/winners',
+  ctrlWrapper(getMatchExactWinnersController),
+);
 matchesRouter.post('/calculate/:matchId', finishAndCalculateMatch);
 matchesRouter.get(
   '/:matchId/prediction-stats',

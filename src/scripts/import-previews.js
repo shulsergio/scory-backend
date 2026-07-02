@@ -17,8 +17,7 @@ const FOLDER_PATH = path.join(__dirname, '../../../fot_data_py/preview');
 async function runImport() {
   console.log('=== Начало импорта превью матчей ===');
 
-  try {
-    // Подключаемся к базе данных
+  try { 
     await mongoose.connect(MONGO_URI);
     console.log('[OK] Подключение к MongoDB успешно.');
 

@@ -149,3 +149,39 @@ export const getPredictionMatchStatsController = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+//--------------------
+
+export const getMatchExactWinnersController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const match = await MatchesCollection.findById(id);
+
+    if (!match || !match.score) {
+      return res.status(404).json({ message: 'Матч или счет не найдены' });
+    }
+
+    const realHomeScore = match.score.home;
+    const realAwayScore = match.score.away;
+
+    const predictions = await PredictorsCollection.find({
+      matchId: id,
+    }).populate('userId', 'username');
+
+    const exactWinners = predictions
+      .filter(
+        (pred) =>
+          pred.homeGoals === realHomeScore && pred.awayGoals === realAwayScore,
+      )
+      .map((pred) => ({
+        userId: pred.userId?._id || pred.userId,
+        username: pred.userId?.username || 'Аноним',
+      }));
+
+    res.json(exactWinners);
+  } catch (error) {
+    console.error('Ошибка в getMatchExactWinners:', error);
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
+};
