@@ -154,9 +154,9 @@ export const getPredictionMatchStatsController = async (req, res) => {
 
 export const getMatchExactWinnersController = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { matchId } = req.params;
 
-    const match = await MatchesCollection.findById(id);
+    const match = await MatchesCollection.findById(matchId);
 
     if (!match || !match.score) {
       return res.status(404).json({ message: 'Матч или счет не найдены' });
@@ -166,7 +166,7 @@ export const getMatchExactWinnersController = async (req, res) => {
     const realAwayScore = match.score.away;
 
     const predictions = await PredictorsCollection.find({
-      matchId: id,
+      matchId: matchId,
     }).populate('userId', 'username');
 
     const exactWinners = predictions
