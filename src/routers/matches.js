@@ -3,11 +3,11 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   getAllMatchesController,
   getMatchByIdController,
-  getMatchExactWinnersController,
 } from '../controllers/matches.js';
 import {
   finishAndCalculateMatch,
   getPredictionMatchStatsController,
+  getMatchExactWinnersController, 
 } from '../controllers/matchController.js';
 import { getPlayoffMatchesController } from '../controllers/playoffController.js';
 
