@@ -167,7 +167,7 @@ export const getMatchExactWinnersController = async (req, res) => {
 
     const predictions = await PredictorsCollection.find({
       matchId: matchId,
-    }).populate('userId', 'username');
+    }).populate('userId', 'userNickname');
 
     const exactWinners = predictions
       .filter(
@@ -176,7 +176,7 @@ export const getMatchExactWinnersController = async (req, res) => {
       )
       .map((pred) => ({
         userId: pred.userId?._id || pred.userId,
-        username: pred.userId?.username || 'Аноним',
+        userNickname: pred.userId?.userNickname || 'Аноним',
       }));
 
     res.json(exactWinners);
