@@ -1,4 +1,5 @@
 import { MatchesCollection } from '../db/models/matches.js';
+import { matchOverviewCollection } from '../db/models/matchOverview.js';
 import { matchPreviewsCollection } from '../db/models/matchPreviews.js';
 
 export const getMatchByIdData = async (matchId) => {
@@ -11,6 +12,7 @@ export const getMatchByIdData = async (matchId) => {
   if (!match) return null;
 
   match.preview = null;
+  match.overview = null;
 
   if (match.status === 'scheduled' && match.fotmobId) {
     const previewData = await matchPreviewsCollection
@@ -23,9 +25,14 @@ export const getMatchByIdData = async (matchId) => {
   }
 
   //   Если матч закончился, то думать тут
-  // if (match.status === 'finished') {
-  //   match.stats = await matchStatsCollection.findOne({ ... });
-  // }
+  if (match.status === 'finished' && match.fotmobId) {
+    const overviewData = await matchOverviewCollection
+      .findOne({ fotmobId: match.fotmobId })
+      .lean();
+    if (overviewData) {
+      match.overview = overviewData;
+    }
+  }
 
   return match;
 };
