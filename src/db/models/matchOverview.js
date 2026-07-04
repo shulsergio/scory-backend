@@ -37,10 +37,28 @@ const matchOverviewSchema = new Schema(
         role: String,
         rating: String,
       },
+      stats: [
+        {
+          title: { type: String },
+          key: { type: String },
+
+          stats: { type: [Schema.Types.Mixed] },
+
+          format: String,
+          type: { type: String },
+          highlighted: { type: String },
+        },
+      ],
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    versionKey: false,
+  },
 );
+
+matchOverviewSchema.index({ fotmobId: 1 });
+
 export const matchOverviewCollection = model(
   'matchoverviews',
   matchOverviewSchema,
