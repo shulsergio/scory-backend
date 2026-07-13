@@ -12,6 +12,7 @@ const teamsSchema = new Schema(
       required: true,
     },
     country: { type: String },
+    fotmobId: { type: Number, unique: true, sparse: true },
   },
   { timestamps: true, versionKey: false },
 );

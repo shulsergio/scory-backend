@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+import { leagueTableRowSchema } from './leagueTableRows.js';
 
 const tournamentsSchema = new Schema(
   {
@@ -12,6 +13,8 @@ const tournamentsSchema = new Schema(
     },
     startDate: Date,
     endDate: Date,
+    fotmobId: { type: Number, unique: true, sparse: true },
+    table: [leagueTableRowSchema],
   },
   { timestamps: true },
 );
