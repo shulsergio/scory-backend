@@ -63,7 +63,7 @@ const matchesSchema = new Schema(
     isPlayoff: { type: Boolean, default: false },
     stage: {
       type: String,
-      enum: ['1/32', '1/16', '1/8', '1/4', '1/2', 'final', null],
+      enum: ['1/32', '1/16', '1/8', '1/4', '1/2', '3 place', 'final', null],
       default: null,
     },
     penaltiesScore: {

@@ -44,12 +44,6 @@ leaguesRouter.delete(
   ctrlWrapper(leaveLeagueController),
 );
 
-leaguesRouter.delete(
-  '/:leagueId/leave',
-  authenticate,
-  ctrlWrapper(leaveLeagueController),
-);
-
 leaguesRouter.patch(
   '/:leagueId',
   authenticate,

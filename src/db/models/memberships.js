@@ -1,11 +1,9 @@
 import { model, Schema } from 'mongoose';
 
- 
 const MembershipSchema = new Schema({
   leagueId: {
- 
     type: Schema.Types.ObjectId,
-    ref: 'leagues',  
+    ref: 'leagues',
     required: true,
     index: true,
   },
@@ -24,6 +22,6 @@ const MembershipSchema = new Schema({
     default: Date.now,
   },
 });
- 
+
 MembershipSchema.index({ leagueId: 1, userId: 1 }, { unique: true });
 export const MembershipCollection = model('memberships', MembershipSchema);

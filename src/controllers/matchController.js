@@ -34,10 +34,10 @@ export const finishAndCalculateMatch = async (req, res) => {
       isCalculated: { $ne: true },
     }).lean();
 
-    console.log('---Найдено прогнозов---', predictions.length);
-    console.log('---matchId---', matchId);
-    console.log('---predictions---', predictions);
-    console.log('---activeLeagueIds---', activeLeagueIds);
+    // console.log('---Найдено прогнозов---', predictions.length);
+    // console.log('---matchId---', matchId);
+    // console.log('---predictions---', predictions);
+    // console.log('---activeLeagueIds---', activeLeagueIds);
 
     if (predictions.length === 0) {
       return res
@@ -69,15 +69,6 @@ export const finishAndCalculateMatch = async (req, res) => {
         },
       });
 
-      //------
-      // Блок не нужен для обновления!!!!
-      // userUpdates.push({
-      //   updateOne: {
-      //     filter: { _id: pred.userId },
-      //     update: { $inc: { points: points } },
-      //   },
-      // });
-      //------
       membershipUpdates.push({
         updateMany: {
           filter: {
