@@ -2,16 +2,23 @@ import { TournamentsCollection } from '../db/models/tournaments.js';
 import { getAllTournaments } from '../service/tournaments.js';
 
 export const getTournamentsController = async (req, res) => {
-  const { status } = req.query;
-  const filter = status ? { status } : {};
+  try {
+    const { tournamentTag } = req.params;
 
-  const tournaments = await getAllTournaments(filter);
+    const filter = { slug: tournamentTag };
 
-  res.json({
-    status: 200,
-    message: 'Турниры успешно получены',
-    data: tournaments,
-  });
+    const tournaments = await getAllTournaments(filter);
+
+    if (!tournaments || tournaments.length === 0) {
+      return res.status(404).json({ message: 'Турнир не найден' });
+    }
+
+    // Возвращаем один найденный турнир
+    return res.status(200).json(tournaments[0]);
+  } catch (error) {
+    console.error('Ошибка при получении турнира:', error);
+    return res.status(500).json({ message: 'Внутренняя ошибка сервера' });
+  }
 };
 
 export const getTournamentsNameList = async (req, res) => {
