@@ -6,8 +6,8 @@ import {
 } from '../controllers/tournaments.js';
 
 const tournamentsRouter = Router();
+tournamentsRouter.get('/list', ctrlWrapper(getTournamentsNameList));
 
 tournamentsRouter.get('/:tournamentTag', ctrlWrapper(getTournamentsController));
-tournamentsRouter.get('/list', ctrlWrapper(getTournamentsNameList));
 
 export default tournamentsRouter;
