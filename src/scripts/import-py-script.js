@@ -102,7 +102,7 @@ async function importLeagueTables() {
   const files = fs.readdirSync(LEAGUE_TABLES_FOLDER);
   // Парсим файлы вида league_54_teams_clean.json
   const jsonFiles = files.filter(
-    (f) => f.startsWith('league_') && f.endsWith('_teams_clean.json'),
+    (f) => f.startsWith('scory_league_') && f.endsWith('_table.json'),
   );
   if (jsonFiles.length === 0)
     return console.log('Нет новых файлов турнирных таблиц.');
