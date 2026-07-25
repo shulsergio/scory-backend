@@ -2,7 +2,8 @@ import { Schema } from 'mongoose';
 
 export const leagueTableRowSchema = new Schema(
   {
-    id: { type: Number, required: true }, // fotmobId команды
+    id: { type: Schema.Types.ObjectId, ref: 'Team' },
+    fotmobId: { type: Number },
     name: { type: String, required: true },
     shortName: { type: String },
     pageUrl: { type: String },
