@@ -11,6 +11,11 @@ const matchesSchema = new Schema(
       required: false,
       default: null,
     },
+    tournamentFotmobId: {
+      type: Number,
+      required: false,
+      index: true,
+    },
     homeTeam: {
       type: Schema.Types.ObjectId,
       ref: 'teams',
@@ -78,5 +83,7 @@ const matchesSchema = new Schema(
 );
 
 matchesSchema.index({ tournament: 1, status: 1 });
+matchesSchema.index({ kickoffTime: 1, tournamentFotmobId: 1 });
 matchesSchema.index({ fotmobId: 1 }, { sparse: true });
+
 export const MatchesCollection = model('matches', matchesSchema);

@@ -8,6 +8,8 @@ import {
   updateLeagueDescriptionService,
 } from '../service/leagues.js';
 import { LeaguesCollection } from '../db/models/leagues.js';
+import { LEAGUE_TYPES_CONFIG } from '../constants/index.js';
+import { MatchesCollection } from '../db/models/matches.js';
 
 /**
  * --контроллер для создания Лиги--
@@ -181,4 +183,45 @@ export const updateLeagueDescriptionController = async (req, res) => {
       description: updatedLeague.description,
     },
   });
+};
+
+export const getAvailableMatchesForAdminController = async (req, res) => {
+  try {
+    const { leagueId } = req.params;
+
+    const league = await LeaguesCollection.findById(leagueId);
+
+    if (!league) {
+      return res.status(404).json({ message: 'Лига не найдена' });
+    }
+
+    if (league.adminId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Доступ запрещен' });
+    }
+
+    // 3. Расчет временного окна (от +1 суток до +7 суток)
+    const now = new Date();
+    const startDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // +24h
+    const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // +7 days
+
+    const targetIds =
+      league.leagueType === 'TOP_LEAGUES'
+        ? LEAGUE_TYPES_CONFIG.TOP_LEAGUES
+        : LEAGUE_TYPES_CONFIG.EUROCUPS;
+
+    const availableMatches = await MatchesCollection.find({
+      tournamentFotmobId: { $in: targetIds },
+      kickoffTime: { $gte: startDate, $lte: endDate },
+      status: 'scheduled',
+    })
+      .populate('homeTeam awayTeam tournament')
+      .sort({ kickoffTime: 1 });
+
+    res.json({
+      selectedMatches: league.selectedMatches || [],
+      availableMatches,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Ошибка сервера', error: error.message });
+  }
 };

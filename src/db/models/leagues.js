@@ -16,10 +16,23 @@ const LeagueSchema = new Schema(
       maxlength: 150,
       default: '',
     },
+    leagueType: {
+      type: String,
+      enum: ['TOP_LEAGUES', 'EUROCUPS'],
+      required: true,
+      default: 'TOP_LEAGUES',
+    },
+
+    selectedMatches: [
+      {
+        type: Number,
+      },
+    ],
+
     tournament: {
       type: Schema.Types.ObjectId,
       ref: 'tournaments',
-      required: true,
+      required: false,
     },
     adminId: {
       type: Schema.Types.ObjectId,

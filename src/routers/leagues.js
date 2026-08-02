@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   createLeagueController,
+  getAvailableMatchesForAdminController,
   getLeagueResultsController,
   getListOfAllLeaguesController,
   getUserLeaguesController,
@@ -49,4 +50,11 @@ leaguesRouter.patch(
   authenticate,
   ctrlWrapper(updateLeagueDescriptionController),
 );
+
+leaguesRouter.get(
+  '/:leagueId/admin/available-matches',
+  authenticate,
+  ctrlWrapper(getAvailableMatchesForAdminController),
+);
+
 export default leaguesRouter;
