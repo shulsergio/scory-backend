@@ -225,3 +225,42 @@ export const getAvailableMatchesForAdminController = async (req, res) => {
     res.status(500).json({ message: 'Ошибка сервера', error: error.message });
   }
 };
+
+/**
+ * --контроллер для сохранения выбранных админом матчей--
+ * leagueId - идентификатор Лиги
+ * selectedMatches - массив ID выбранных матчей из req.body
+ */
+export const updateSelectedMatchesController = async (req, res) => {
+  try {
+    const { leagueId } = req.params;
+    const { selectedMatches } = req.body;
+
+    if (!Array.isArray(selectedMatches)) {
+      return res
+        .status(400)
+        .json({ message: 'selectedMatches должен быть массивом' });
+    }
+
+    const league = await LeaguesCollection.findById(leagueId);
+
+    if (!league) {
+      return res.status(404).json({ message: 'Лига не найдена' });
+    }
+
+    if (league.adminId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Доступ запрещен' });
+    }
+
+    league.selectedMatches = selectedMatches;
+    await league.save();
+
+    res.status(200).json({
+      status: 200,
+      message: 'Список матчей успешно обновлен',
+      data: league.selectedMatches,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Ошибка сервера', details: error.message });
+  }
+};

@@ -8,6 +8,7 @@ import {
   joinLeagueController,
   leaveLeagueController,
   updateLeagueDescriptionController,
+  updateSelectedMatchesController,
 } from '../controllers/leagues.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { authenticate } from '../middleware/authenticate.js';
@@ -55,6 +56,12 @@ leaguesRouter.get(
   '/:leagueId/admin/available-matches',
   authenticate,
   ctrlWrapper(getAvailableMatchesForAdminController),
+);
+
+leaguesRouter.post(
+  '/:leagueId/select-matches',
+  authenticate,
+  ctrlWrapper(updateSelectedMatchesController),
 );
 
 export default leaguesRouter;
