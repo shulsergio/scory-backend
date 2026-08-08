@@ -23,21 +23,21 @@ import { MatchesCollection } from '../db/models/matches.js';
  * @return {*}
  */
 export const createLeagueController = async (req, res) => {
-  const { name, description, tournament } = req.body;
+  const { name, description, leagueType } = req.body;
   const adminId = req.user._id;
 
   if (!name || name.trim().length < 3) {
-    throw createHttpError(400, 'min 3 words');
+    throw createHttpError(400, 'min 3 characters');
   }
 
-  if (!tournament) {
-    throw createHttpError(400, 'Need add tournament');
+  if (!leagueType || !['TOP_LEAGUES', 'EUROCUPS'].includes(leagueType)) {
+    throw createHttpError(400, 'Invalid league type');
   }
 
   const league = await createLeague({
     name: name.trim(),
     description: description?.trim(),
-    tournament,
+    leagueType,
     adminId,
   });
 
