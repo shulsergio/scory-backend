@@ -8,7 +8,7 @@ export const leagueTableRowSchema = new Schema(
     shortName: { type: String },
     pageUrl: { type: String },
     deduction: { type: Number, default: null },
-    ongoing: { type: String, default: null },
+    ongoing: { type: Schema.Types.Mixed, default: null },
     played: { type: Number, default: 0 },
     wins: { type: Number, default: 0 },
     draws: { type: Number, default: 0 },
