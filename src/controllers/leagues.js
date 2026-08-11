@@ -204,7 +204,7 @@ export const getAvailableMatchesForAdminController = async (req, res) => {
     // 3. Расчет временного окна (от +1 суток до +7 суток)
     const now = new Date();
     const startDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // +24h
-    const endDate = new Date(now.getTime() + 35 * 24 * 60 * 60 * 1000); // +7 days
+    const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // +7 days
 
     const rawIds =
       league.leagueType === 'TOP_LEAGUES'
