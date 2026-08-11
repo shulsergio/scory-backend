@@ -236,6 +236,10 @@ export const getAvailableMatchesForAdminController = async (req, res) => {
  */
 export const updateSelectedMatchesController = async (req, res) => {
   try {
+    if (!req.user?._id) {
+      return res.status(401).json({ message: 'Пользователь не авторизован' });
+    }
+
     const { leagueId } = req.params;
     const { selectedMatches } = req.body;
 
@@ -264,6 +268,7 @@ export const updateSelectedMatchesController = async (req, res) => {
       data: league.selectedMatches,
     });
   } catch (error) {
+    console.error('[UPDATE SELECTED MATCHES ERROR]:', error);
     res.status(500).json({ message: 'Ошибка сервера', details: error.message });
   }
 };
