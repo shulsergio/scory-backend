@@ -27,14 +27,19 @@ export const upsertPredictionController = async (req, res) => {
 };
 
 export const getMatchesWithPredictionsController = async (req, res) => {
-  const userId = req.user._id;
-  const { league } = req.query;
+  try {
+    const userId = req.user._id;
+    const { league } = req.query;
 
-  const matches = await getMatchesWithPredictions(userId, league || 'WC2026');
+    const matches = await getMatchesWithPredictions(userId, league);
 
-  res.status(200).json({
-    status: 200,
-    message: 'Success',
-    data: matches,
-  });
+    res.status(200).json({
+      status: 200,
+      message: 'Success',
+      data: matches,
+    });
+  } catch (error) {
+    console.error('Error in getMatchesWithPredictions:', error);
+    res.status(500).json({ message: 'Ошибка сервера', error: error.message });
+  }
 };

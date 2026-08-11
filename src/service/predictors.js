@@ -1,8 +1,9 @@
 import createHttpError from 'http-errors';
 import { MatchesCollection } from '../db/models/matches.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
-import { TournamentsCollection } from '../db/models/tournaments.js';
+// import { TournamentsCollection } from '../db/models/tournaments.js';
 import mongoose from 'mongoose';
+import { LeaguesCollection } from '../db/models/leagues.js';
 
 export const upsertPrediction = async ({
   userId,
@@ -35,35 +36,36 @@ export const upsertPrediction = async ({
   return prediction;
 };
 
-export const getMatchesWithPredictions = async (userId, league = 'WC2026') => {
-  const tournamentDoc = await TournamentsCollection.findOne({
-    slug: league,
-  }).lean();
+export const getMatchesWithPredictions = async (userId, leagueId) => {
+  const targetUserId = new mongoose.Types.ObjectId(userId);
+  let matchIdsToFetch = [];
 
-  console.log('league (строка с фронта):', league);
-  console.log('Найденный документ турнира:', tournamentDoc);
+  if (leagueId) {
+    const leagueDoc = await LeaguesCollection.findById(leagueId).lean();
+    if (leagueDoc && leagueDoc.selectedMatches) {
+      matchIdsToFetch = leagueDoc.selectedMatches;
+    }
+  } else {
+    const userLeagues = await LeaguesCollection.find({
+      members: targetUserId,
+    }).lean();
 
-  if (!tournamentDoc) {
-    console.log(`--- Турнир ${league} не найден ---`);
+    const allSelected = userLeagues.flatMap((l) => l.selectedMatches || []);
+    matchIdsToFetch = [...new Set(allSelected.map((id) => id.toString()))];
+  }
+
+  if (!matchIdsToFetch.length) {
     return [];
   }
-  const targetTournamentId = new mongoose.Types.ObjectId(tournamentDoc._id);
-  const targetUserId = new mongoose.Types.ObjectId(userId);
 
-  const testMatch = await MatchesCollection.findOne({
-    tournament: tournamentDoc._id,
-  }).lean();
-  console.log('2. Тестовый матч по ObjectId турнира:', testMatch);
-
-  // const testStringMatch = await MatchesCollection.findOne({
-  //   tournament: league,
-  // }).lean();
-  // console.log('3. Тестовый матч по строке турнира:', testStringMatch);
+  const targetMatchObjectIds = matchIdsToFetch.map(
+    (id) => new mongoose.Types.ObjectId(id),
+  );
 
   const matches = await MatchesCollection.aggregate([
     {
       $match: {
-        tournament: targetTournamentId, 
+        _id: { $in: targetMatchObjectIds },
       },
     },
     {
@@ -76,7 +78,7 @@ export const getMatchesWithPredictions = async (userId, league = 'WC2026') => {
               $expr: {
                 $and: [
                   { $eq: ['$matchId', '$$matchId'] },
-                  { $eq: ['$userId', targetUserId] },  
+                  { $eq: ['$userId', targetUserId] },
                 ],
               },
             },
@@ -108,6 +110,15 @@ export const getMatchesWithPredictions = async (userId, league = 'WC2026') => {
       },
     },
     { $unwind: '$awayTeam' },
+    {
+      $lookup: {
+        from: 'tournaments',
+        localField: 'tournament',
+        foreignField: '_id',
+        as: 'tournament',
+      },
+    },
+    { $unwind: { path: '$tournament', preserveNullAndEmptyArrays: true } },
     {
       $sort: { kickoffTime: 1 },
     },
