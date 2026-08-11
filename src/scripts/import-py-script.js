@@ -8,6 +8,7 @@ import { matchOverviewCollection } from '../db/models/matchOverview.js';
 import { TournamentsCollection } from '../db/models/tournaments.js';
 import { TeamsCollection } from '../db/models/teams.js';
 import { MatchesCollection } from '../db/models/matches.js';
+import { calculateAllFinishedMatches } from '../controllers/matchController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -265,11 +266,17 @@ async function importLeagueMatches() {
   );
   if (jsonFiles.length === 0) return console.log('Нет новых файлов матчей.');
 
-  // Загружаем карты ObjectId для команд и турниров
-  const [teamsList, tournamentsList] = await Promise.all([
+  // 1. Подтягиваем команды, турниры И уже завершенные матчи из нашей БД
+  const [teamsList, tournamentsList, finishedMatches] = await Promise.all([
     TeamsCollection.find({}, { _id: 1, fotmobId: 1 }).lean(),
     TournamentsCollection.find({}, { _id: 1, fotmobId: 1 }).lean(),
+    MatchesCollection.find({ status: 'finished' }, { fotmobId: 1 }).lean(),
   ]);
+
+  // Создаем Set со строковыми fotmobId завершенных матчей
+  const finishedFotmobIds = new Set(
+    finishedMatches.map((m) => String(m.fotmobId)),
+  );
 
   const teamsMap = new Map(
     teamsList
@@ -307,6 +314,13 @@ async function importLeagueMatches() {
     }
 
     for (const match of matchesArray) {
+      const matchFotmobIdStr = String(match.fotmobId);
+
+      // 💡 2. Проверка: Если этот матч уже завершен в нашей базе — пропускаем его!
+      if (finishedFotmobIds.has(matchFotmobIdStr)) {
+        continue;
+      }
+
       const homeTeamFotmobId = Number(match.homeTeamFotmobId);
       const awayTeamFotmobId = Number(match.awayTeamFotmobId);
       const tournamentFotmobId = Number(match.tournamentFotmobId);
@@ -337,7 +351,7 @@ async function importLeagueMatches() {
 
       bulkOperations.push({
         updateOne: {
-          filter: { fotmobId: String(match.fotmobId) },
+          filter: { fotmobId: matchFotmobIdStr },
           update: { $set: matchDocument },
           upsert: true,
         },
@@ -349,6 +363,10 @@ async function importLeagueMatches() {
     const result = await MatchesCollection.bulkWrite(bulkOperations);
     console.log(
       `[League Matches] Вставлено новых: ${result.upsertedCount}, Обновлено: ${result.modifiedCount}`,
+    );
+  } else {
+    console.log(
+      '[League Matches] Нет новых данных для обновления или все матчи уже завершены.',
     );
   }
 }
@@ -372,6 +390,11 @@ async function runMainImport() {
       importLeagueTables(),
       importLeagueMatches(),
     ]);
+
+    // 3. Сразу после импорта матчей запускаем автоматический подсчёт очков
+    console.log('--- Автоматический подсчёт очков за матчи ---');
+    const calcResult = await calculateAllFinishedMatches();
+    console.log('[OK] Подсчёт завершён:', calcResult);
 
     console.log('[Успех] Все данные успешно синхронизированы.');
   } catch (error) {

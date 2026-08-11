@@ -8,7 +8,7 @@ import { PredictorsCollection } from '../db/models/predictors.js';
 import { LeaguesCollection } from '../db/models/leagues.js';
 import { MembershipCollection } from '../db/models/memberships.js';
 import { TournamentStatsCollection } from '../db/models/tournamentStats.js';
-
+import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 
 export const finishAndCalculateMatch = async (req, res) => {
@@ -34,11 +34,6 @@ export const finishAndCalculateMatch = async (req, res) => {
       isCalculated: { $ne: true },
     }).lean();
 
-    // console.log('---Найдено прогнозов---', predictions.length);
-    // console.log('---matchId---', matchId);
-    // console.log('---predictions---', predictions);
-    // console.log('---activeLeagueIds---', activeLeagueIds);
-
     if (predictions.length === 0) {
       return res
         .status(200)
@@ -47,7 +42,6 @@ export const finishAndCalculateMatch = async (req, res) => {
 
     // ОБНОВА ПАКЕТОМ!!!
     const predictionUpdates = [];
-    // const userUpdates = [];--- юзера не обновляю (удалить с коллекции)
     const membershipUpdates = [];
     const tournamentUpdates = [];
 
@@ -175,4 +169,149 @@ export const getMatchExactWinnersController = async (req, res) => {
     console.error('Ошибка в getMatchExactWinners:', error);
     res.status(500).json({ message: 'Ошибка сервера' });
   }
+};
+
+// -------
+
+// -------
+
+// -------
+
+export const calculateAllFinishedMatches = async () => {
+  // 1. Ищем все завершённые, но ещё не просчитанные матчи
+  const matchesToProcess = await MatchesCollection.find({
+    status: 'finished',
+    isCalculated: { $ne: true },
+  }).lean();
+
+  if (matchesToProcess.length === 0) {
+    return { message: 'Нет матчей для подсчета', processedMatches: 0 };
+  }
+
+  let totalProcessedPredictions = 0;
+
+  // 2. Обрабатываем каждый матч
+  for (const match of matchesToProcess) {
+    const matchId = match._id;
+    const homeScore = match.score?.home;
+    const awayScore = match.score?.away;
+
+    // Пропускаем, если счет не был корректно записан в БД
+    if (homeScore === undefined || awayScore === undefined) {
+      console.warn(
+        `Матч ${matchId} завершен, но счет отсутствует. Пропускаем.`,
+      );
+      continue;
+    }
+
+    // Приводим ID к ObjectId для надежного поиска в Mongo
+    const matchObjectId = new mongoose.Types.ObjectId(matchId);
+
+    // Ищем лиги, где админы добавили этот матч в selectedMatches
+    const activeLeagues = await LeaguesCollection.find({
+      selectedMatches: matchObjectId,
+    }).select('_id');
+
+    const activeLeagueIds = activeLeagues.map((l) => l._id);
+
+    // Ищем все непросчитанные прогнозы на данный матч
+    const predictions = await PredictorsCollection.find({
+      matchId: matchObjectId,
+      isCalculated: { $ne: true },
+    }).lean();
+
+    // Если прогнозов нет — закрываем матч, чтобы не крутить его повторно
+    if (predictions.length === 0) {
+      await MatchesCollection.findByIdAndUpdate(matchId, {
+        isCalculated: true,
+      });
+      continue;
+    }
+
+    const predictionUpdates = [];
+    const membershipUpdates = [];
+    const tournamentUpdates = [];
+
+    // 3. Формируем батчи обновлений
+    predictions.forEach((pred) => {
+      const points = calculatePoints(
+        pred.homeGoals,
+        pred.awayGoals,
+        homeScore,
+        awayScore,
+      );
+
+      const isExact =
+        pred.homeGoals === homeScore && pred.awayGoals === awayScore;
+      const isOutcome = points > 0 && !isExact;
+
+      // Обновляем сам прогноз
+      predictionUpdates.push({
+        updateOne: {
+          filter: { _id: pred._id },
+          update: { $set: { points, isCalculated: true } },
+        },
+      });
+
+      // Обновляем очки участника в приватных лигах
+      if (activeLeagueIds.length > 0) {
+        membershipUpdates.push({
+          updateMany: {
+            filter: {
+              userId: pred.userId,
+              leagueId: { $in: activeLeagueIds },
+            },
+            update: { $inc: { totalPoints: points } },
+          },
+        });
+      }
+
+      // Обновляем общую статистику турнира (если у матча есть tournament)
+      if (match.tournament) {
+        tournamentUpdates.push({
+          updateOne: {
+            filter: {
+              userId: pred.userId,
+              tournament: match.tournament,
+            },
+            update: {
+              $inc: {
+                points: points,
+                matchesPredicted: 1,
+                exactScores: isExact ? 1 : 0,
+                correctOutcomes: isOutcome ? 1 : 0,
+              },
+            },
+            upsert: true,
+          },
+        });
+      }
+    });
+
+    const bulkPromises = [];
+
+    if (predictionUpdates.length > 0) {
+      bulkPromises.push(PredictorsCollection.bulkWrite(predictionUpdates));
+    }
+    if (membershipUpdates.length > 0) {
+      bulkPromises.push(MembershipCollection.bulkWrite(membershipUpdates));
+    }
+    if (tournamentUpdates.length > 0) {
+      bulkPromises.push(TournamentStatsCollection.bulkWrite(tournamentUpdates));
+    }
+
+    if (bulkPromises.length > 0) {
+      await Promise.all(bulkPromises);
+    }
+
+    await MatchesCollection.findByIdAndUpdate(matchId, { isCalculated: true });
+
+    totalProcessedPredictions += predictions.length;
+  }
+
+  return {
+    success: true,
+    processedMatches: matchesToProcess.length,
+    processedPredictions: totalProcessedPredictions,
+  };
 };
