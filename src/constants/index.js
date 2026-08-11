@@ -8,7 +8,7 @@ export const LEAGUE_TYPES_CONFIG = {
     55, //   (Italy)
     54, //   (Germany)
     53, //   (France)
-    335, //  (Ukraine)
+    441, //  (Ukraine)
   ],
   EUROCUPS: [
     42, // UEFA Champions League
