@@ -10,6 +10,8 @@ import {
 import { LeaguesCollection } from '../db/models/leagues.js';
 import { LEAGUE_TYPES_CONFIG } from '../constants/index.js';
 import { MatchesCollection } from '../db/models/matches.js';
+import '../db/models/teams.js';
+import '../db/models/tournaments.js';
 
 /**
  * --контроллер для создания Лиги--
@@ -195,7 +197,7 @@ export const getAvailableMatchesForAdminController = async (req, res) => {
       return res.status(404).json({ message: 'Лига не найдена' });
     }
 
-    if (league.adminId.toString() !== req.user._id.toString()) {
+    if (league.adminId?.toString() !== req.user?._id?.toString()) {
       return res.status(403).json({ message: 'Доступ запрещен' });
     }
 
