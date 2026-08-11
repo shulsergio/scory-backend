@@ -25,7 +25,8 @@ const LeagueSchema = new Schema(
 
     selectedMatches: [
       {
-        type: Number,
+        type: Schema.Types.ObjectId,
+        ref: 'matches',
       },
     ],
 
