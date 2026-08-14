@@ -5,20 +5,22 @@ import createHttpError from 'http-errors';
 /**
  * --сервис для создания лиги--
  * @param {*} name -- название лиги
+ * @param {*} description -- описание лиги
+ * @param {*} leagueType -- тип лиги ('TOP_LEAGUES' | 'EUROCUPS')
  * @param {*} adminId -- id администратора лиги
  * @returns -- новая лига
  */
 export const createLeague = async ({
   name,
   description,
-  tournament,
+  leagueType, // 💡 ИСПРАВЛЕНО: раньше тут был tournament
   adminId,
 }) => {
   try {
     const newLeague = await LeaguesCollection.create({
       name,
       description,
-      tournament,
+      leagueType,
       adminId,
       members: [adminId],
     });
