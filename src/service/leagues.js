@@ -13,7 +13,7 @@ import createHttpError from 'http-errors';
 export const createLeague = async ({
   name,
   description,
-  leagueType, // 💡 ИСПРАВЛЕНО: раньше тут был tournament
+  leagueType,
   adminId,
 }) => {
   try {
