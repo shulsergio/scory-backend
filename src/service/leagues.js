@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { LeaguesCollection } from '../db/models/leagues.js';
 import { MembershipCollection } from '../db/models/memberships.js';
 import createHttpError from 'http-errors';
@@ -133,27 +134,41 @@ export const getUserLeagues = async (userId) => {
 };
 
 export const joinLeagueService = async (leagueId, userId) => {
-  const league = await LeaguesCollection.findById(leagueId);
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+  const leagueObjectId = new mongoose.Types.ObjectId(leagueId);
+
+  const league = await LeaguesCollection.findById(leagueObjectId);
   if (!league) {
     throw createHttpError(404, 'League not found');
   }
+
   const existingMembership = await MembershipCollection.findOne({
-    leagueId,
-    userId,
+    leagueId: leagueObjectId,
+    userId: userObjectId,
   });
+
   if (existingMembership) {
     throw createHttpError(400, 'You are already a member of this league');
   }
+
   const newMembership = await MembershipCollection.create({
-    leagueId,
-    userId,
+    leagueId: leagueObjectId,
+    userId: userObjectId,
     totalPoints: 0,
   });
+
+  await LeaguesCollection.findByIdAndUpdate(leagueObjectId, {
+    $addToSet: { members: userObjectId },
+  });
+
   return newMembership;
 };
 
 export const leaveLeagueService = async (leagueId, userId) => {
-  const league = await LeaguesCollection.findById(leagueId);
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+  const leagueObjectId = new mongoose.Types.ObjectId(leagueId);
+
+  const league = await LeaguesCollection.findById(leagueObjectId);
 
   if (!league) throw createHttpError(404, 'League not found');
 
@@ -165,13 +180,17 @@ export const leaveLeagueService = async (leagueId, userId) => {
   }
 
   const result = await MembershipCollection.findOneAndDelete({
-    leagueId,
-    userId,
+    leagueId: leagueObjectId,
+    userId: userObjectId,
   });
 
   if (!result) {
     throw createHttpError(400, 'You are not a member of this league');
   }
+
+  await LeaguesCollection.findByIdAndUpdate(leagueObjectId, {
+    $pull: { members: userObjectId },
+  });
 
   return { message: 'Success' };
 };
