@@ -48,12 +48,17 @@ export const createLeague = async ({
  */
 export const getLeagueResults = async (leagueId, page, limit) => {
   const league = await LeaguesCollection.findById(leagueId)
-    .populate('tournament', 'name slug')
+    .populate({
+      path: 'selectedMatches',
+      populate: { path: 'homeTeam awayTeam tournament' },
+    })
     .lean();
 
   if (!league) {
     throw createHttpError(404, 'League not found');
   }
+  const tournamentName =
+    league.leagueType === 'EUROCUPS' ? 'European Cups' : 'Top Leagues';
 
   const skip = (page - 1) * limit;
 
@@ -87,7 +92,7 @@ export const getLeagueResults = async (leagueId, page, limit) => {
     description: league.description || '',
     adminId: league.adminId,
     avatarUrl: league.avatarUrl || null,
-    tournamentName: league.tournament?.name || 'No tournament',
+    tournamentName: tournamentName || 'No tournament',
     tournamentSlug: league.tournament?.slug || null,
 
     leaderboard,
