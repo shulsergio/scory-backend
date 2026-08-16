@@ -57,6 +57,7 @@ export const getLeagueResults = async (leagueId, page, limit) => {
   if (!league) {
     throw createHttpError(404, 'League not found');
   }
+
   const tournamentName =
     league.leagueType === 'EUROCUPS' ? 'European Cups' : 'Top Leagues';
 
@@ -92,8 +93,9 @@ export const getLeagueResults = async (leagueId, page, limit) => {
     description: league.description || '',
     adminId: league.adminId,
     avatarUrl: league.avatarUrl || null,
-    tournamentName: tournamentName || 'No tournament',
-    tournamentSlug: league.tournament?.slug || null,
+    leagueType: league.leagueType || 'TOP_LEAGUES',
+    tournamentName,
+    selectedMatches: league.selectedMatches || [],
 
     leaderboard,
     pagination: {
