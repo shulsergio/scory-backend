@@ -11,7 +11,7 @@ const stadiumSchema = new Schema(
       lng: { type: Number },
     },
   },
-  { _id: false }, // Чтобы Mongoose не создавал лишние _id для вложенных объектов
+  { _id: false },
 );
 
 const coachSchema = new Schema(
@@ -26,13 +26,22 @@ const coachSchema = new Schema(
   { _id: false },
 );
 
-const squadLineSchema = new Schema(
+const playerSchema = new Schema(
   {
-    title: { type: String }, // 'keepers', 'defenders', etc.
-    players: [{ type: Number }], // Массив Fotmob ID игроков
+    id: { type: Number },
+    name: { type: String },
   },
   { _id: false },
 );
+
+const squadLineSchema = new Schema(
+  {
+    title: { type: String },
+    players: [playerSchema],
+  },
+  { _id: false },
+);
+
 const fixtureTeamSchema = new Schema(
   {
     id: Number,
@@ -43,10 +52,10 @@ const fixtureTeamSchema = new Schema(
 
 const fixtureSchema = new Schema(
   {
-    id: Number, // fotmobId матча
-    date: String, // строка с датой ISO
-    status: String, // 'FT', 'NS' и т.д.
-    scoreStr: String, // '2 - 2'
+    id: Number,
+    date: String,
+    status: String,
+    scoreStr: String,
     home: fixtureTeamSchema,
     away: fixtureTeamSchema,
     tournament: String,
@@ -62,7 +71,7 @@ const teamsSchema = new Schema(
     flagCode: { type: String },
     logoUrl: { type: String },
     country: { type: String },
-    fotmobId: { type: Number, unique: true, sparse: true },
+    fotmobId: { type: Number, sparse: true },
 
     league: { type: String },
 
