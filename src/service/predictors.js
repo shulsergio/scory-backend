@@ -1,9 +1,9 @@
 import createHttpError from 'http-errors';
 import { MatchesCollection } from '../db/models/matches.js';
 import { PredictorsCollection } from '../db/models/predictors.js';
-// import { TournamentsCollection } from '../db/models/tournaments.js';
 import mongoose from 'mongoose';
 import { LeaguesCollection } from '../db/models/leagues.js';
+import { MembershipCollection } from '../db/models/memberships.js';
 
 export const upsertPrediction = async ({
   userId,
@@ -41,13 +41,23 @@ export const getMatchesWithPredictions = async (userId, leagueId) => {
   let matchIdsToFetch = [];
 
   if (leagueId) {
+    // 1. Если передана конкретная лига
     const leagueDoc = await LeaguesCollection.findById(leagueId).lean();
     if (leagueDoc && leagueDoc.selectedMatches) {
       matchIdsToFetch = leagueDoc.selectedMatches;
     }
   } else {
+    // 💡 2. Если грузим ВСЕ прогнозы юзера во всех его лигах:
+
+    // Шаг А: Ищем все членства пользователя
+    const userMemberships = await MembershipCollection.find({
+      userId: targetUserId,
+    }).lean();
+
+    const userLeagueIds = userMemberships.map((m) => m.leagueId);
+
     const userLeagues = await LeaguesCollection.find({
-      members: targetUserId,
+      $or: [{ _id: { $in: userLeagueIds } }, { adminId: targetUserId }],
     }).lean();
 
     const allSelected = userLeagues.flatMap((l) => l.selectedMatches || []);
