@@ -1,23 +1,11 @@
 import { Schema, model } from 'mongoose';
 
-const stadiumSchema = new Schema(
+// Схема игрока в составе с новыми деталями
+const playerSchema = new Schema(
   {
+    id: { type: Number },
     name: { type: String },
-    city: { type: String },
-    capacity: { type: Number },
-    opened: { type: Number },
-    coordinates: {
-      lat: { type: Number },
-      lng: { type: Number },
-    },
-  },
-  { _id: false },
-);
-
-const coachSchema = new Schema(
-  {
-    fotmobId: { type: Number },
-    name: { type: String },
+    shirtNumber: { type: Number },
     age: { type: Number },
     dateOfBirth: { type: String },
     ccode: { type: String },
@@ -26,14 +14,7 @@ const coachSchema = new Schema(
   { _id: false },
 );
 
-const playerSchema = new Schema(
-  {
-    id: { type: Number },
-    name: { type: String },
-  },
-  { _id: false },
-);
-
+// Схема линии состава
 const squadLineSchema = new Schema(
   {
     title: { type: String },
@@ -42,27 +23,25 @@ const squadLineSchema = new Schema(
   { _id: false },
 );
 
-const fixtureTeamSchema = new Schema(
+// Схема следующего матча
+const nextMatchSchema = new Schema(
   {
-    id: Number,
-    name: String,
+    id: { type: String },
+    kickoffTime: { type: String },
+    tournament: { type: String },
+    home: {
+      id: { type: Number },
+      name: { type: String },
+    },
+    away: {
+      id: { type: Number },
+      name: { type: String },
+    },
   },
   { _id: false },
 );
 
-const fixtureSchema = new Schema(
-  {
-    id: Number,
-    date: String,
-    status: String,
-    scoreStr: String,
-    home: fixtureTeamSchema,
-    away: fixtureTeamSchema,
-    tournament: String,
-  },
-  { _id: false },
-);
-
+// Основная схема команды
 const teamsSchema = new Schema(
   {
     name: { type: String, required: true },
@@ -71,7 +50,7 @@ const teamsSchema = new Schema(
     flagCode: { type: String },
     logoUrl: { type: String },
     country: { type: String },
-    fotmobId: { type: Number, sparse: true },
+    fotmobId: { type: Number, unique: true, sparse: true },
 
     league: { type: String },
 
@@ -79,10 +58,11 @@ const teamsSchema = new Schema(
       darkMode: { type: String },
       lightMode: { type: String },
     },
-    stadium: stadiumSchema,
-    coach: coachSchema,
+    stadium: Schema.Types.Mixed,
+    coach: Schema.Types.Mixed,
+    nextMatch: { type: nextMatchSchema, default: null },
     squadLines: [squadLineSchema],
-    fixtures: [fixtureSchema],
+    fixtures: [Schema.Types.Mixed],
   },
   { timestamps: true, versionKey: false },
 );
