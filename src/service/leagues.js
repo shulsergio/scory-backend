@@ -82,6 +82,7 @@ export const getLeagueResults = async (leagueId, page, limit) => {
       userName: m.userId.userName,
       nickname: m.userId.userNickname,
       points: m.totalPoints,
+      predictionsCount: m.predictionsCount || 0,
       joinedAt: m.createdAt,
       rank: skip + index + 1,
       country: m.userId.country || null,

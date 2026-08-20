@@ -261,7 +261,12 @@ export const calculateAllFinishedMatches = async () => {
               userId: pred.userId,
               leagueId: { $in: activeLeagueIds },
             },
-            update: { $inc: { totalPoints: points } },
+            update: {
+              $inc: {
+                totalPoints: points,
+                predictionsCount: 1,
+              },
+            },
           },
         });
       }
