@@ -123,10 +123,11 @@ export const getListOfAllLeaguesController = async (req, res) => {
         leagueName: '$name',
         leagueAvatar: '$avatarUrl',
         adminId: 1,
+        createdAt: 1,
         membersCount: { $size: '$members' },
       },
     },
-    { $sort: { membersCount: -1 } },
+    { $sort: { createdAt: -1 } },
   ]);
 
   res.status(200).json({
