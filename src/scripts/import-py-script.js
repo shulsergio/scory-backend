@@ -9,6 +9,7 @@ import { TournamentsCollection } from '../db/models/tournaments.js';
 import { TeamsCollection } from '../db/models/teams.js';
 import { MatchesCollection } from '../db/models/matches.js';
 import { calculateAllFinishedMatches } from '../controllers/matchController.js';
+import { PlayersCollection } from '../db/models/players.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +32,8 @@ const LEAGUE_MATCHES_FOLDER = path.join(
   __dirname,
   '../../../fot_data_py/league_matches',
 );
+const PLAYERS_FOLDER = path.join(__dirname, '../../../fot_data_py/players');
+
 // --- PREVIEW ---
 async function importPreviews() {
   if (!fs.existsSync(PREVIEW_FOLDER))
@@ -267,7 +270,6 @@ async function importLeagueMatches() {
   );
   if (jsonFiles.length === 0) return console.log('Нет новых файлов матчей.');
 
-  // 1. Подтягиваем команды, турниры И уже завершенные матчи из нашей БД
   const [teamsList, tournamentsList, finishedMatches] = await Promise.all([
     TeamsCollection.find({}, { _id: 1, fotmobId: 1 }).lean(),
     TournamentsCollection.find({}, { _id: 1, fotmobId: 1 }).lean(),
@@ -372,6 +374,91 @@ async function importLeagueMatches() {
   }
 }
 
+// --- IMPORT PLAYERS 🏃‍♂️ ---
+async function importPlayersData() {
+  if (!fs.existsSync(PLAYERS_FOLDER)) {
+    return console.log(`[Skip] Папка игроков (${PLAYERS_FOLDER}) не найдена.`);
+  }
+
+  const files = fs.readdirSync(PLAYERS_FOLDER);
+  const jsonFiles = files.filter(
+    (f) => f.startsWith('scory_player_') && f.endsWith('.json'),
+  );
+
+  if (jsonFiles.length === 0) {
+    return console.log('Нет новых файлов данных игроков.');
+  }
+
+  // Загружаем карту команд для связи ObjectId
+  const teamsList = await TeamsCollection.find(
+    {},
+    { _id: 1, fotmobId: 1 },
+  ).lean();
+  const teamsMap = new Map(
+    teamsList
+      .filter((t) => t.fotmobId != null)
+      .map((t) => [Number(t.fotmobId), t._id]),
+  );
+
+  const bulkOperations = [];
+
+  for (const file of jsonFiles) {
+    const filePath = path.join(PLAYERS_FOLDER, file);
+    const fileData = fs.readFileSync(filePath, 'utf-8');
+
+    let playerData;
+    try {
+      playerData = JSON.parse(fileData);
+    } catch (e) {
+      console.log(`Ошибка чтения JSON в файле ${file}`, e);
+      continue;
+    }
+
+    if (!playerData || !playerData.id) continue;
+
+    const fotmobPlayerId = Number(playerData.id);
+    const rawTeamId = playerData.team?.id ? Number(playerData.team.id) : null;
+    const mongoTeamId = rawTeamId ? teamsMap.get(rawTeamId) || null : null;
+
+    // Готовим документ для базы
+    const playerDocument = {
+      fotmobId: fotmobPlayerId,
+      name: playerData.name,
+      gender: playerData.gender || 'male',
+      birthDate: playerData.birthDate ? new Date(playerData.birthDate) : null,
+      profile: playerData.profile || {},
+      team: {
+        id: mongoTeamId,
+        fotmobTeamId: rawTeamId,
+        name: playerData.team?.name,
+        onLoan: playerData.team?.onLoan || false,
+        league_id: playerData.team?.league_id,
+        league_name: playerData.team?.league_name,
+        season: playerData.team?.season,
+      },
+      position: playerData.position || {},
+      current_season_stats: playerData.current_season_stats || {},
+      advanced_stats_per_90: playerData.advanced_stats_per_90 || {},
+      trophies: playerData.trophies || [],
+    };
+
+    bulkOperations.push({
+      updateOne: {
+        filter: { fotmobId: fotmobPlayerId },
+        update: { $set: playerDocument },
+        upsert: true,
+      },
+    });
+  }
+
+  if (bulkOperations.length > 0) {
+    const result = await PlayersCollection.bulkWrite(bulkOperations);
+    console.log(
+      `[Players Import] Вставлено новых: ${result.upsertedCount}, Обновлено: ${result.modifiedCount}`,
+    );
+  }
+}
+
 // --- RUN ALL ---
 async function runMainImport() {
   console.log('=== Запуск полного импорта данных Scory ===');
@@ -381,15 +468,16 @@ async function runMainImport() {
 
     await TeamsCollection.syncIndexes().catch(() => {});
 
-    // 1. Сначала подтягиваем ВСЕ команды
+    // 1. Подтягиваем ВСЕ команды
     await importTeamsData();
 
-    // 2. Параллельно импортируем превью, обзоры, таблицы и матчи
+    // 2. Импорт превью, обзоры, таблицы и матчи + игроков
     await Promise.all([
       importPreviews(),
       importOverview(),
       importLeagueTables(),
       importLeagueMatches(),
+      importPlayersData(),
     ]);
 
     // 3. Сразу после импорта матчей запускаем автоматический подсчёт очков
