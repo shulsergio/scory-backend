@@ -7,6 +7,7 @@ import leaguesRouter from './leagues.js';
 import predictorsRouter from './predictors.js';
 import rankingRouter from './ranking.js';
 import usersRouter from './users.js';
+import playersRouter from './players.js';
 import tournamentsRouter from './tournaments.js';
 
 const indexRouter = Router();
@@ -20,5 +21,6 @@ indexRouter.use('/leagues', leaguesRouter);
 indexRouter.use('/predictors', predictorsRouter);
 indexRouter.use('/ranking', rankingRouter);
 indexRouter.use('/users', usersRouter);
+indexRouter.use('/players', playersRouter);
 indexRouter.use('/tournaments', tournamentsRouter);
 export default indexRouter;
