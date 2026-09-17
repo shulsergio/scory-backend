@@ -7,8 +7,8 @@ import leaguesRouter from './leagues.js';
 import predictorsRouter from './predictors.js';
 import rankingRouter from './ranking.js';
 import usersRouter from './users.js';
-import playersRouter from './players.js';
 import tournamentsRouter from './tournaments.js';
+import playersRouter from './players.js';
 
 const indexRouter = Router();
 console.log('***** CONSOLE - index - IS OK');
