@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getPlayerByIdController } from '../controllers/players';
+import { getPlayerByIdController } from '../controllers/players.js';
 
 const playersRouter = Router();
 
