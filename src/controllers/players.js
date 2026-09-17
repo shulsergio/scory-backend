@@ -1,4 +1,4 @@
-import { getPlayerByIdService } from '../service/players';
+import { getPlayerByIdService } from '../service/players.js';
 
 export const getPlayerByIdController = async (req, res) => {
   const { id } = req.params;
