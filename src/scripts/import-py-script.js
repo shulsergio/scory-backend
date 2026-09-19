@@ -375,6 +375,21 @@ async function importLeagueMatches() {
 }
 
 // --- IMPORT PLAYERS 🏃‍♂️ ---
+
+function createSlug(name, id) {
+  if (!name) return String(id);
+
+  const cleanName = name
+    .toLowerCase()
+    .normalize('NFD') // Разбивает букву и диакритику (например, é -> e)
+    .replace(/[\u0300-\u036f]/g, '') // Удаляет диакритические знаки
+    .replace(/[^a-z0-9\s-]/g, '') // Удаляет спецсимволы
+    .trim()
+    .replace(/\s+/g, '-');
+
+  return `${cleanName}-${id}`;
+}
+
 async function importPlayersData() {
   if (!fs.existsSync(PLAYERS_FOLDER)) {
     return console.log(`[Skip] Папка игроков (${PLAYERS_FOLDER}) не найдена.`);
@@ -420,9 +435,12 @@ async function importPlayersData() {
     const rawTeamId = playerData.team?.id ? Number(playerData.team.id) : null;
     const mongoTeamId = rawTeamId ? teamsMap.get(rawTeamId) || null : null;
 
+    const playerSlug = createSlug(playerData.name, fotmobPlayerId);
+
     // Готовим документ для базы
     const playerDocument = {
       fotmobId: fotmobPlayerId,
+      slug: playerSlug,
       name: playerData.name,
       gender: playerData.gender || 'male',
       birthDate: playerData.birthDate ? new Date(playerData.birthDate) : null,

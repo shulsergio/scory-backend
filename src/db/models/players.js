@@ -8,6 +8,11 @@ const playerSchema = new Schema(
       unique: true,
       index: true,
     },
+    slug: {
+      type: String,
+      unique: true,
+      index: true,
+    },
     name: {
       type: String,
       required: true,
