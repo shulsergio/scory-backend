@@ -1,4 +1,16 @@
-import { getPlayerByIdService } from '../service/players.js';
+import {
+  getPlayerByIdService,
+  getPlayersSitemapService,
+} from '../service/players.js';
+
+export const getPlayersSitemapController = async (req, res) => {
+  try {
+    const players = await getPlayersSitemapService();
+    res.status(200).json({ status: 200, data: players });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const getPlayerByIdController = async (req, res) => {
   const { id } = req.params;

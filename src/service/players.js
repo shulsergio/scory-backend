@@ -2,6 +2,13 @@ import createHttpError from 'http-errors';
 import { PlayersCollection } from '../db/models/players.js';
 import mongoose from 'mongoose';
 
+export const getPlayersSitemapService = async () => {
+  return await PlayersCollection.find(
+    {},
+    { slug: 1, fotmobId: 1, updatedAt: 1 },
+  ).lean();
+};
+
 export const getPlayerByIdService = async (id) => {
   const isMongoId = mongoose.Types.ObjectId.isValid(id);
   const numericId = Number(id);
