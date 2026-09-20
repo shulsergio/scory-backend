@@ -33,6 +33,7 @@ const matchOverviewSchema = new Schema(
       playerOfTheMatch: {
         id: Number,
         name: String,
+        slug: String,
         team: String,
         role: String,
         rating: String,
