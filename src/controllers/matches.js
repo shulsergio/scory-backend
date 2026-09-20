@@ -57,6 +57,29 @@ export const getAllMatchesController = async (req, res) => {
   }
 };
 
+export const getMatchesSitemapController = async (req, res) => {
+  try {
+    const matches = await MatchesCollection.find(
+      {},
+      { _id: 1, fotmobId: 1, updatedAt: 1, kickoffTime: 1 }, //
+    )
+      .sort({ kickoffTime: -1 })
+      .lean();
+
+    res.status(200).json({
+      status: 200,
+      message: 'Matches for sitemap fetched successfully',
+      data: matches,
+    });
+  } catch (error) {
+    console.error('Ошибка в getMatchesSitemapController:', error);
+    res.status(500).json({
+      status: 500,
+      error: 'Ошибка при получении данных для sitemap.',
+    });
+  }
+};
+
 export const getMatchByIdController = async (req, res) => {
   const { matchId } = req.params;
 

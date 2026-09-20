@@ -3,17 +3,19 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   getAllMatchesController,
   getMatchByIdController,
+  getMatchesSitemapController,
 } from '../controllers/matches.js';
 import {
   finishAndCalculateMatch,
   getPredictionMatchStatsController,
-  getMatchExactWinnersController, 
+  getMatchExactWinnersController,
 } from '../controllers/matchController.js';
 import { getPlayoffMatchesController } from '../controllers/playoffController.js';
 
 const matchesRouter = Router();
 
 matchesRouter.get('/', ctrlWrapper(getAllMatchesController));
+matchesRouter.get('/sitemap', ctrlWrapper(getMatchesSitemapController));
 matchesRouter.get(
   '/tournament/:tournamentTag/playoff',
   ctrlWrapper(getPlayoffMatchesController),
