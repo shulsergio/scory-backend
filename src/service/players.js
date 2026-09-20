@@ -9,17 +9,27 @@ export const getPlayersSitemapService = async () => {
   ).lean();
 };
 
-export const getPlayerByIdService = async (id) => {
-  const isMongoId = mongoose.Types.ObjectId.isValid(id);
-  const numericId = Number(id);
+export const getPlayerByIdService = async (identifier) => {
+  const isMongoId = mongoose.Types.ObjectId.isValid(identifier);
+  const numericId = Number(identifier);
 
-  const filter = isMongoId
-    ? { _id: id }
-    : { fotmobId: !isNaN(numericId) ? numericId : 0 };
-  const player = await PlayersCollection.findOne(filter).lean();
+  const conditions = [
+    { slug: identifier }, // 1. Ищем по слагу (lautaro-martinez-690230)
+  ];
+
+  if (isMongoId) {
+    conditions.push({ _id: identifier }); // 2. Ищем по Mongo ObjectId
+  }
+
+  if (!isNaN(numericId)) {
+    conditions.push({ fotmobId: numericId }); // 3. Ищем по  Id
+  }
+
+  const player = await PlayersCollection.findOne({ $or: conditions }).lean();
 
   if (!player) {
     throw createHttpError(404, 'Player not found');
   }
+
   return player;
 };
