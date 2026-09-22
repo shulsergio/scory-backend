@@ -1,4 +1,5 @@
-import { model, models, Schema } from 'mongoose';
+import mongoose from 'mongoose';
+const { model, Schema } = mongoose;
 
 // Обновленная схема события
 const matchEventSchema = new Schema(
@@ -89,5 +90,7 @@ const matchOverviewSchema = new Schema(
 
 matchOverviewSchema.index({ fotmobId: 1 });
 
-export const matchOverviewCollection =
-  models.matchoverviews || model('matchoverviews', matchOverviewSchema);
+export const matchOverviewCollection = model(
+  'matchoverviews',
+  matchOverviewSchema,
+);
