@@ -1,4 +1,22 @@
-import { model, Schema } from 'mongoose';
+import { model, models, Schema } from 'mongoose';
+
+// Обновленная схема события
+const matchEventSchema = new Schema(
+  {
+    timeStr: Schema.Types.Mixed,
+    name: String, // Имя игрока
+    type: String, // Goal / Card
+    card: String, // YellowRed / Red / null
+    overloadTime: Schema.Types.Mixed,
+    id: Number, // ID игрока
+    slug: String, // Slug игрока (gabriel-veiga-1116734)
+    newScore: [Number],
+    ownGoal: Boolean,
+    penShootoutScore: Schema.Types.Mixed,
+    assistPlayerId: Number,
+  },
+  { _id: false },
+);
 
 const matchOverviewSchema = new Schema(
   {
@@ -29,6 +47,11 @@ const matchOverviewSchema = new Schema(
       windSpeed: Number,
     },
 
+    events: {
+      home: { type: [matchEventSchema], default: [] },
+      away: { type: [matchEventSchema], default: [] },
+    },
+
     content: {
       playerOfTheMatch: {
         id: Number,
@@ -50,6 +73,12 @@ const matchOverviewSchema = new Schema(
           highlighted: { type: String },
         },
       ],
+      h2h: {
+        summary: {
+          type: [Number],
+          default: [],
+        },
+      },
     },
   },
   {
@@ -60,7 +89,5 @@ const matchOverviewSchema = new Schema(
 
 matchOverviewSchema.index({ fotmobId: 1 });
 
-export const matchOverviewCollection = model(
-  'matchoverviews',
-  matchOverviewSchema,
-);
+export const matchOverviewCollection =
+  models.matchoverviews || model('matchoverviews', matchOverviewSchema);
