@@ -32,4 +32,4 @@ const articleSchema = new Schema(
 
 articleSchema.index({ leagueSlug: 1, publishedAt: -1 });
 
-export const ArticleCollection = model('articles', articleSchema);
+export const ArticlesCollection = model('articles', articleSchema);
