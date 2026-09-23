@@ -1,5 +1,5 @@
 import createHttpError from 'http-errors';
-import { getArticleByIdOrSlug } from '../service/articles';
+import { getArticleByIdOrSlug } from '../service/articles.js';
 
 export const getArticleByIdController = async (req, res) => {
   const { articleId } = req.params;
