@@ -9,6 +9,7 @@ import rankingRouter from './ranking.js';
 import usersRouter from './users.js';
 import tournamentsRouter from './tournaments.js';
 import playersRouter from './players.js';
+import articlesRouter from './articles.js';
 
 const indexRouter = Router();
 console.log('***** CONSOLE - index - IS OK');
@@ -20,6 +21,7 @@ indexRouter.use('/matches', matchesRouter);
 indexRouter.use('/leagues', leaguesRouter);
 indexRouter.use('/predictors', predictorsRouter);
 indexRouter.use('/ranking', rankingRouter);
+indexRouter.use('/articles', articlesRouter);
 indexRouter.use('/users', usersRouter);
 indexRouter.use('/players', playersRouter);
 indexRouter.use('/tournaments', tournamentsRouter);
