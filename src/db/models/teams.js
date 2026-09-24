@@ -5,6 +5,7 @@ const playerSchema = new Schema(
   {
     id: { type: Number },
     name: { type: String },
+    slug: { type: String },
     shirtNumber: { type: Number },
     age: { type: Number },
     dateOfBirth: { type: String },
