@@ -1,11 +1,16 @@
 import { TournamentsCollection } from '../db/models/tournaments.js';
 import { getAllTournaments } from '../service/tournaments.js';
+import mongoose from 'mongoose';
 
 export const getTournamentsController = async (req, res) => {
   try {
     const { tournamentTag } = req.params;
 
-    const filter = { slug: tournamentTag };
+    const isObjectId = mongoose.Types.ObjectId.isValid(tournamentTag);
+
+    const filter = isObjectId
+      ? { _id: tournamentTag }
+      : { slug: tournamentTag };
 
     const tournaments = await getAllTournaments(filter);
 
