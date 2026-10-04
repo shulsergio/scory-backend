@@ -4,6 +4,6 @@ import { getArticleBySlugController } from '../controllers/articles.js';
 
 const articlesRouter = Router();
 
-articlesRouter.get('/articles/:slug', ctrlWrapper(getArticleBySlugController));
+articlesRouter.get('/:slug', ctrlWrapper(getArticleBySlugController));
 
 export default articlesRouter;
