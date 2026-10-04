@@ -8,13 +8,15 @@ const articleSchema = new Schema(
     type: {
       type: String,
       enum: ['preview', 'review', 'news', 'analytics'],
-      default: 'news',
+      default: 'review',
     }, // Тип: превью, обзор, новость
     excerpt: { type: String, required: true },
-    content: { type: String, required: true },
+    contentBlockOne: { type: String },
+    contentBlockTwo: { type: String },
+    contentBlockThree: { type: String },
     coverImage: { type: String, required: false },
 
-    // 💡 Связи с другими сущностями
+    // Связь с другими данніми
     leagueSlug: { type: String, index: true },
     matchFotmobId: { type: String, index: true },
     teamSlugs: [{ type: String, index: true }],

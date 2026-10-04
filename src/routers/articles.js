@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { getArticleByIdController } from '../controllers/articles.js';
+import { getArticleBySlugController } from '../controllers/articles.js';
 
 const articlesRouter = Router();
 
-articlesRouter.get('/:articleId', ctrlWrapper(getArticleByIdController));
+articlesRouter.get('/articles/:slug', ctrlWrapper(getArticleBySlugController));
 
 export default articlesRouter;

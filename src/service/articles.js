@@ -10,7 +10,7 @@ export const getArticleByIdOrSlug = async (identifier) => {
     { ...filter, isPublished: true },
     { $inc: { viewsCount: 1 } },
     { new: true }, // Возвращаем обновленный документ
-  );
+  ).lean();
 
   return article;
 };

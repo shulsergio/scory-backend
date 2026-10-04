@@ -1,10 +1,10 @@
 import createHttpError from 'http-errors';
 import { getArticleByIdOrSlug } from '../service/articles.js';
 
-export const getArticleByIdController = async (req, res) => {
-  const { articleId } = req.params;
+export const getArticleBySlugController = async (req, res) => {
+  const { slug } = req.params;
 
-  const article = await getArticleByIdOrSlug(articleId);
+  const article = await getArticleByIdOrSlug(slug);
 
   if (!article) {
     throw createHttpError(404, 'Статтю не знайдено');
