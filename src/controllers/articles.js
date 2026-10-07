@@ -21,18 +21,24 @@ export const getArticleBySlugController = async (req, res) => {
 export const getAllArticlesBySlug = async (req, res) => {
   const { slug } = req.params;
 
-  const news = await ArticlesCollection.find({
-    leagueSlug: slug,
+  const filter = {
     isPublished: true,
-  })
+  };
+
+  if (slug) {
+    filter.leagueSlug = slug;
+  }
+
+  let query = ArticlesCollection.find(filter)
     .sort({ createdAt: -1 })
-    .limit(4)
     .select('title slug excerpt coverImage createdAt')
     .lean();
 
-  if (!news) {
-    throw createHttpError(404, 'Статтю не знайдено');
+  if (slug) {
+    query = query.limit(4);
   }
+
+  const news = await query;
 
   res.status(200).json({
     status: 200,
