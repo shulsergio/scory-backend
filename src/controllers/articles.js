@@ -25,7 +25,7 @@ export const getAllArticlesBySlug = async (req, res) => {
     isPublished: true,
   };
 
-  if (slug) {
+  if (slug !== 'all') {
     filter.leagueSlug = slug;
   }
 
@@ -34,7 +34,7 @@ export const getAllArticlesBySlug = async (req, res) => {
     .select('title slug excerpt coverImage createdAt')
     .lean();
 
-  if (slug) {
+  if (slug !== 'all') {
     query = query.limit(4);
   }
 
