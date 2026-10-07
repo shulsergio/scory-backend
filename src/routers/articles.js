@@ -8,6 +8,6 @@ import {
 const articlesRouter = Router();
 
 articlesRouter.get('/:slug', ctrlWrapper(getArticleBySlugController));
-articlesRouter.get('/league/:slug?', ctrlWrapper(getAllArticlesBySlug));
+articlesRouter.get('/league/:slug', ctrlWrapper(getAllArticlesBySlug));
 
 export default articlesRouter;
