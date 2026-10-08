@@ -30,7 +30,7 @@ export const getAllArticlesBySlug = async (req, res) => {
   }
 
   let query = ArticlesCollection.find(filter)
-    .sort({ createdAt: -1 })
+    .sort({ _id: -1 })
     .select('title slug excerpt coverImage createdAt')
     .lean();
 

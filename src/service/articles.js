@@ -9,7 +9,7 @@ export const getArticleByIdOrSlug = async (identifier) => {
   const article = await ArticlesCollection.findOneAndUpdate(
     { ...filter, isPublished: true },
     { $inc: { viewsCount: 1 } },
-    { new: true }, // Возвращаем обновленный документ
+    { new: true },
   ).lean();
 
   return article;
