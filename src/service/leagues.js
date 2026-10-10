@@ -87,7 +87,9 @@ export const getLeagueResults = async (leagueId, page, limit) => {
       rank: skip + index + 1,
       country: m.userId.country || null,
     }));
-
+  const sortedMatches = (league.selectedMatches || []).sort((a, b) => {
+    return new Date(a.kickoffTime) - new Date(b.kickoffTime);
+  });
   return {
     id: league._id,
     leagueName: league.name,
@@ -96,7 +98,7 @@ export const getLeagueResults = async (leagueId, page, limit) => {
     avatarUrl: league.avatarUrl || null,
     leagueType: league.leagueType || 'TOP_LEAGUES',
     tournamentName,
-    selectedMatches: league.selectedMatches || [],
+    selectedMatches: sortedMatches || [],
 
     leaderboard,
     pagination: {
