@@ -35,7 +35,7 @@ export const getAllArticlesBySlug = async (req, res) => {
     .lean();
 
   if (slug !== 'all') {
-    query = query.limit(7);
+    query = query.limit(20);
   }
 
   const news = await query;
