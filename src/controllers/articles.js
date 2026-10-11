@@ -31,7 +31,7 @@ export const getAllArticlesBySlug = async (req, res) => {
 
   let query = ArticlesCollection.find(filter)
     .sort({ _id: -1 })
-    .select('title slug excerpt coverImage createdAt')
+    .select('leagueName title slug excerpt coverImage createdAt')
     .lean();
 
   if (slug !== 'all') {
