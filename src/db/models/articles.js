@@ -20,7 +20,13 @@ const articleSchema = new Schema(
     leagueSlug: { type: String, index: true },
     leagueName: { type: String },
     matchFotmobId: { type: String, index: true },
-    teamSlugs: [{ type: String, index: true }],
+    teamIds: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'teams',
+        index: true,
+      },
+    ],
 
     author: {
       name: { type: String, default: 'Scory' },
