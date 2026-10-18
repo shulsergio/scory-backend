@@ -32,7 +32,7 @@ export const getAllArticlesBySlug = async (req, res) => {
   let query = ArticlesCollection.find(filter)
     .sort({ _id: -1 })
     .select(
-      'leagueName title slug excerpt coverImage teamIds playersIds createdAt',
+      'leagueName title slug excerpt coverImage teamsIds playersIds createdAt',
     )
     .populate('teamsIds', 'name shortName')
     .populate('playersIds', 'name slug')
