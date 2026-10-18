@@ -31,11 +31,15 @@ export const getAllArticlesBySlug = async (req, res) => {
 
   let query = ArticlesCollection.find(filter)
     .sort({ _id: -1 })
-    .select('leagueName title slug excerpt coverImage createdAt')
+    .select(
+      'leagueName title slug excerpt coverImage teamIds playersIds createdAt',
+    )
+    .populate('teamsIds', 'name shortName')
+    .populate('playersIds', 'name slug')
     .lean();
 
   if (slug !== 'all') {
-    query = query.limit(20);
+    query = query.limit(50);
   }
 
   const news = await query;
