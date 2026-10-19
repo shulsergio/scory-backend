@@ -34,8 +34,8 @@ export const getAllArticlesBySlug = async (req, res) => {
     .select(
       'leagueName title slug excerpt coverImage teamsIds playersIds createdAt',
     )
-    .populate('teamsIds', 'name shortName')
-    .populate('playersIds', 'name slug')
+    // .populate('teamsIds', 'name shortName')
+    // .populate('playersIds', 'name slug')
     .lean();
 
   if (slug !== 'all') {
