@@ -10,7 +10,10 @@ export const getArticleByIdOrSlug = async (identifier) => {
     { ...filter, isPublished: true },
     { $inc: { viewsCount: 1 } },
     { new: true },
-  ).lean();
+  )
+    .populate('teamsIds', 'name shortName')
+    .populate('playersIds', 'name slug')
+    .lean();
 
   return article;
 };
