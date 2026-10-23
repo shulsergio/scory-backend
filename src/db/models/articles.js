@@ -19,7 +19,13 @@ const articleSchema = new Schema(
     // Связь с другими данніми
     leagueSlug: { type: String, index: true },
     leagueName: { type: String },
-    matchFotmobId: { type: String, index: true },
+    matchId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'matches',
+        index: true,
+      },
+    ],
     teamsIds: [
       {
         type: Schema.Types.ObjectId,
