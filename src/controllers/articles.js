@@ -98,10 +98,10 @@ export const getArticlesByPlayerController = async (req, res) => {
 };
 
 export const getArticlesByMatchController = async (req, res) => {
-  const { matchId } = req.params;
+  const { matchID } = req.params;
 
   const news = await ArticlesCollection.find({
-    matchId: matchId,
+    matchID: matchID,
     isPublished: true,
   })
     .sort({ _id: -1 })

@@ -18,7 +18,7 @@ articlesRouter.get(
   ctrlWrapper(getArticlesByPlayerController),
 );
 articlesRouter.get(
-  '/match/:matchId',
+  '/match/:matchID',
   ctrlWrapper(getArticlesByMatchController),
 );
 
