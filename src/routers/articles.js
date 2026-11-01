@@ -5,6 +5,7 @@ import {
   getArticleBySlugController,
   getArticlesByPlayerController,
   getArticlesByTeamController,
+  getArticlesByMatchController,
 } from '../controllers/articles.js';
 
 const articlesRouter = Router();
@@ -15,6 +16,10 @@ articlesRouter.get('/team/:teamId', ctrlWrapper(getArticlesByTeamController));
 articlesRouter.get(
   '/player/:playerId',
   ctrlWrapper(getArticlesByPlayerController),
+);
+articlesRouter.get(
+  '/match/:matchId',
+  ctrlWrapper(getArticlesByMatchController),
 );
 
 export default articlesRouter;

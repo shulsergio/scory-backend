@@ -96,3 +96,25 @@ export const getArticlesByPlayerController = async (req, res) => {
     data: news,
   });
 };
+
+export const getArticlesByMatchController = async (req, res) => {
+  const { matchId } = req.params;
+
+  const news = await ArticlesCollection.find({
+    matchId: matchId,
+    isPublished: true,
+  })
+    .sort({ _id: -1 })
+    .select(
+      'leagueName title slug excerpt coverImage teamsIds playersIds createdAt',
+    )
+    .populate('teamsIds', 'name shortName slug')
+    .populate('playersIds', 'name slug')
+    .lean();
+
+  res.status(200).json({
+    status: 200,
+    message: 'Done',
+    data: news,
+  });
+};
