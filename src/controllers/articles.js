@@ -2,6 +2,21 @@ import createHttpError from 'http-errors';
 import { getArticleByIdOrSlug } from '../service/articles.js';
 import { ArticlesCollection } from '../db/models/articles.js';
 
+export const getArticlesSitemapController = async (req, res) => {
+  const articles = await ArticlesCollection.find(
+    { isPublished: true },
+    'slug updatedAt createdAt',
+  )
+    .sort({ _id: -1 })
+    .lean();
+
+  res.status(200).json({
+    status: 200,
+    message: 'Done',
+    data: articles,
+  });
+};
+
 export const getArticleBySlugController = async (req, res) => {
   const { slug } = req.params;
 
@@ -39,7 +54,7 @@ export const getAllArticlesBySlug = async (req, res) => {
     .lean();
 
   if (slug !== 'all') {
-    query = query.limit(50);
+    query = query.limit(120);
   }
 
   const news = await query;
